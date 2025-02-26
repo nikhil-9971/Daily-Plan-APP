@@ -305,29 +305,29 @@
           }
         });
       // Sabhi Field Ko mendartory kare
-      document
-        .getElementById("submitBtn")
-        .addEventListener("click", function () {
-          let roCode = document.getElementById("roCode").value.trim();
-          let engineer = document.getElementById("engineer").value.trim();
-          let issueType = document.getElementById("issueType").value.trim();
-          let purpose = document.getElementById("purpose").value.trim();
-          let date = document.getElementById("date").value.trim();
+      // document
+      //   .getElementById("submitBtn")
+      //   .addEventListener("click", function () {
+      //     let roCode = document.getElementById("roCode").value.trim();
+      //     let engineer = document.getElementById("engineer").value.trim();
+      //     let issueType = document.getElementById("issueType").value.trim();
+      //     let purpose = document.getElementById("purpose").value.trim();
+      //     let date = document.getElementById("date").value.trim();
 
-          if (!roCode || !engineer || !issueType || !purpose || !date) {
-            Swal.fire({
-              icon: "error",
-              title: "Error",
-              text: "Please fill all field !",
-            });
-          } else {
-            Swal.fire({
-              icon: "success",
-              title: "Success",
-              text: "Thanks! 🎉 ",
-            });
-          }
-        });
+      //     if (!roCode || !engineer || !issueType || !purpose || !date) {
+      //       Swal.fire({
+      //         icon: "error",
+      //         title: "Error",
+      //         text: "Please fill all field !",
+      //       });
+      //     } else {
+      //       Swal.fire({
+      //         icon: "success",
+      //         title: "Success",
+      //         text: "Thanks! 🎉 ",
+      //       });
+      //     }
+      //   });
     </script>
   </body>
 </html>
