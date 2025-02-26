@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daily Plan Update</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+      body {
+        background: linear-gradient(135deg, #a8edea, #fed6e3);
+        font-family: "Poppins", sans-serif;
+      }
+      .container {
+        background: #ffffff;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+        max-width: 450px;
+        width: 100%;
+      }
+      .input-box {
+        transition: all 0.3s ease-in-out;
+      }
+      .input-box:focus {
+        box-shadow: 0px 0px 10px rgba(0, 128, 0, 0.3);
+        border-color: #16a34a;
+      }
+      .btn {
+        transition: all 0.3s ease-in-out;
+      }
+      .btn:hover {
+        transform: scale(1.05);
+      }
+    </style>
+  </head>
+  <body class="flex items-center justify-center min-h-screen p-4 sm:p-6 md:p-8">
+    <div class="container w-full sm:w-3/4 md:w-2/3 lg:w-1/2 xl:w-1/3">
+      <h2 class="text-3xl font-bold mb-6 text-center text-gray-800">
+        Daily Plan Update
+      </h2>
+
+      <label class="block mt-4 font-medium">REGION:</label>
+      <input
+        id="region"
+        type="text"
+        class="input-box w-full p-3 border rounded-lg bg-gray-100"
+        readonly
+      />
+      <select id="regionSelect" class="w-full p-2 border rounded-lg hidden">
+        <option>BEGUSARAI</option>
+        <option>PATNA</option>
+      </select>
+
+      <label class="block mt-4 text-gray-600 font-medium">RO CODE:</label>
+      <input
+        id="roCode"
+        type="text"
+        class="input-box w-full p-3 border rounded-lg"
+        maxlength="8"
+      />
+
+      <label class="block mt-4 text-gray-600 font-medium">RO NAME:</label>
+      <input
+        id="roName"
+        type="text"
+        class="input-box w-full p-3 border rounded-lg bg-gray-100"
+        readonly
+      />
+
+      <!-- Phase List -->
+      <label class="block mt-4 text-gray-600 font-medium">PHASE:</label>
+      <select
+        id="phase"
+        class="input-box w-full p-3 border rounded-lg"
+        disabled
+      >
+        <option>HPCL/Phase-X</option>
+        <option>HPCL/Phase-XI</option>
+        <option>HPCL/Phase-XII</option>
+        <option>HPCL/Phase-XIII</option>
+        <option>JIO BP</option>
+        <option>NPL</option>
+        <option>NO PLAN</option>
+        <option>IN LEAVE</option>
+      </select>
+      <!-- Engineer Name List  -->
+      <label class="block mt-4 text-gray-600 font-medium">Engineer Name:</label>
+      <select id="engineer" class="input-box w-full p-3 border rounded-lg">
+        <option value="" disabled selected class="text-gray-600">
+          Select Engineer Name ⬇️
+        </option>
+        <option>Abhishek Pathak</option>
+        <option>Amit Kumar</option>
+        <option>Banti Kumar</option>
+        <option>Gautam Kumar</option>
+        <option>Gautam Kumar (Purnia)</option>
+        <option>Kaushal Pandey</option>
+        <option>Raushan Kumar</option>
+        <option>Shaurav Kumar</option>
+        <option>Vinit Kumar</option>
+      </select>
+
+      <!-- Issue Type -->
+      <label class="block mt-4 text-gray-600 font-medium">Issue Type:</label>
+      <select id="issueType" class="input-box w-full p-3 border rounded-lg">
+        <option value="" disabled selected class="text-gray-600">
+          Select Issue Type ⬇️
+        </option>
+        <option>Issue Visit</option>
+        <option>PM Visit</option>
+        <option>Issue & PM Visit</option>
+        <option>Survey</option>
+        <option>Power ON</option>
+        <option>SAT</option>
+      </select>
+
+      <label class="block mt-4 text-gray-600 font-medium"
+        >PURPOSE OF VISIT:</label
+      >
+      <input
+        id="purpose"
+        type="text"
+        class="input-box w-full p-3 border rounded-lg"
+        required
+        oninput="this.value = this.value.toUpperCase()"
+      />
+
+      <label class="block mt-4 text-gray-600 font-medium">DATE OF VISIT:</label>
+      <input
+        id="date"
+        type="date"
+        class="input-box w-full p-3 border rounded-lg"
+        required
+      />
+
+      <button
+        id="submitBtn"
+        class="btn w-full mt-6 bg-green-500 text-white py-3 px-4 rounded-lg hover:bg-green-600 shadow-md"
+      >
+        Submit
+      </button>
+
+      <p class="text-gray-400 m-12 justify-center">
+        Developed By Nikhil Trivedi Version: 26.02.25
+      </p>
+    </div>
+
+    <script>
+      const API_URL =
+        "https://script.google.com/macros/s/AKfycbxQXG3kOZgFS_eZAw7YYTzfvJMgf65qEovL64-8M6zrBX7GTMb_xAyAGEMObH5NkahfeA/exec";
+
+      function handleROCodeChange() {
+        const roCode = document
+          .getElementById("roCode")
+          .value.trim()
+          .toUpperCase();
+        const regionField = document.getElementById("region");
+        const regionDropdown = document.getElementById("regionSelect");
+        const roNameField = document.getElementById("roName");
+        const phaseField = document.getElementById("phase");
+        const engineerName = document.getElementById("engineer");
+        const issueTypeField = document.getElementById("issueType");
+
+        // Check if RO Code starts with 'JH', 'BH', or 'CM'
+        if (/^(JH|BH|CM)/.test(roCode)) {
+          regionField.readOnly = false;
+          roNameField.readOnly = false;
+          phaseField.disabled = false;
+          regionField.classList.remove("bg-gray-100");
+          roNameField.classList.remove("bg-gray-100");
+          phaseField.classList.remove("bg-gray-100");
+          engineerName.classList.remove("bg-gray-100");
+        } else {
+          regionField.readOnly = true;
+          roNameField.readOnly = true;
+          phaseField.disabled = true;
+          regionField.classList.add("bg-gray-100");
+          roNameField.classList.add("bg-gray-100");
+          phaseField.classList.add("bg-gray-100");
+          engineerName.classList.add("bg-gray-100");
+        }
+
+        if (roCode === "NO PLAN") {
+          regionField.classList.add("hidden");
+          regionDropdown.classList.remove("hidden");
+          roNameField.value = "NO PLAN";
+          phaseField.value = "NO PLAN";
+        } else {
+          regionField.classList.remove("hidden");
+          regionDropdown.classList.add("hidden");
+          fetchRODetails(roCode);
+        }
+      }
+      document
+        .getElementById("roCode")
+        .addEventListener("input", handleROCodeChange);
+
+      async function fetchRODetails(roCode) {
+        if (roCode.length !== 8) return;
+        try {
+          const response = await fetch(`${API_URL}?roCode=${roCode}`);
+          const result = await response.json();
+          document.getElementById("roName").value =
+            result.roName || "Not Found";
+          document.getElementById("region").value =
+            result.region || "Not Found";
+          document.getElementById("phase").value = result.phase || "Not Found";
+          document.getElementById("engineer").value =
+            result.engineer || "Not Found";
+        } catch (error) {
+          console.error("Error fetching RO details:", error);
+        }
+      }
+
+      document
+        .getElementById("roCode")
+        .addEventListener("input", handleROCodeChange);
+
+      //current date aayega
+      document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("date").valueAsDate = new Date();
+      });
+
+      document
+        .getElementById("submitBtn")
+        .addEventListener("click", async function (event) {
+          event.preventDefault();
+          const submitBtn = document.getElementById("submitBtn");
+          submitBtn.disabled = true;
+          submitBtn.innerText = "Submitting...";
+
+          const roCode = document
+            .getElementById("roCode")
+            .value.trim()
+            .toUpperCase();
+          const region =
+            roCode === "NO PLAN"
+              ? document.getElementById("regionSelect").value
+              : document.getElementById("region").value.trim();
+          const roName = document.getElementById("roName").value.trim();
+          const phase = document.getElementById("phase").value;
+          const purpose = document.getElementById("purpose").value.trim();
+          const date = document.getElementById("date").value;
+          const engineer = document.getElementById("engineer").value;
+          const issueType = document.getElementById("issueType").value;
+          const timestamp = new Date().toLocaleString();
+
+          if (
+            !/^(JH|BH|CM)/.test(roCode) &&
+            roCode !== "NO PLAN" &&
+            !/^\d{8}$/.test(roCode)
+          ) {
+            Swal.fire({
+              icon: "error",
+              title: "Invalid RO Code",
+              text: "RO CODE must be exactly 8 digits unless it starts with JH, BH, or CM!",
+            });
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Submit";
+            return;
+          }
+
+          const data = {
+            region,
+            engineer,
+            phase,
+            roCode,
+            roName,
+            issueType,
+            purpose,
+            date,
+          };
+
+          try {
+            const response = await fetch(API_URL, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(data),
+            });
+            const result = await response.json();
+            Swal.fire({
+              icon: result.status === "success" ? "success" : "error",
+              title:
+                result.status === "success" ? "Success!" : "Submission Failed",
+              text: `Submitted at: ${timestamp}\n${result.message}`,
+            }).then(() => {
+              if (result.status === "success") {
+                // सभी इनपुट फ़ील्ड्स को रीसेट करें
+                document.getElementById("roCode").value = "";
+                document.getElementById("region").value = "";
+                document.getElementById("roName").value = "";
+                document.getElementById("phase").value = "";
+                document.getElementById("purpose").value = "";
+                document.getElementById("date").valueAsDate = new Date();
+                document.getElementById("engineer").value = "";
+                document.getElementById("issueType").value = ""; // Default वैल्यू सेट करें
+              }
+            });
+          } catch (error) {
+            console.error("Request failed:", error);
+          } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Submit";
+          }
+        });
+      // Sabhi Field Ko mendartory kare
+      document
+        .getElementById("submitBtn")
+        .addEventListener("click", function () {
+          let roCode = document.getElementById("roCode").value.trim();
+          let engineer = document.getElementById("engineer").value.trim();
+          let issueType = document.getElementById("issueType").value.trim();
+          let purpose = document.getElementById("purpose").value.trim();
+          let date = document.getElementById("date").value.trim();
+
+          if (!roCode || !engineer || !issueType || !purpose || !date) {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "Please fill all field !",
+            });
+          } else {
+            Swal.fire({
+              icon: "success",
+              title: "Success",
+              text: "Thanks! 🎉 ",
+            });
+          }
+        });
+    </script>
+  </body>
+</html>
