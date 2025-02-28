@@ -114,7 +114,7 @@ document.addEventListener("DOMContentLoaded", function () {
       engineer: engineer.value,
       phase: phase.value,
       issueType: issueType.value,
-      purpose: purpose.value,
+      purpose: purpose.value.toUpperCase(),
       dateOfVisit: dateOfVisit.value,
     };
 
