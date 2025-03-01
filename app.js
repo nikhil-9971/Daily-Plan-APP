@@ -23,8 +23,11 @@ document.addEventListener("DOMContentLoaded", function () {
           console.log("API Response:", data);
           if (data) {
             region.value = data.region || "Not Found";
+            region.setAttribute("readonly", true);
             roName.value = data.roName || "Not Found";
+            roName.setAttribute("readonly", true);
             phase.value = data.phase || "";
+            phase.setAttribute("disabled", true);
             engineer.value = data.engineer || "";
           }
         })
@@ -33,16 +36,23 @@ document.addEventListener("DOMContentLoaded", function () {
         );
     }
 
+    // When user enter NO PLAN in RO Code field
     if (roCode.value.toUpperCase() === "NO PLAN") {
-      roCode.value = "0";
+      roCode.value = "N/A";
       convertRegionToDropdown();
       roName.value = "NO PLAN";
+      roName.setAttribute("readonly", true);
       phase.value = "NO PLAN";
+      phase.setAttribute("disabled", true);
+      issueType.value = "NO PLAN";
+      issueType.setAttribute("disabled", true);
+      purpose.value = "NO PLAN";
+      purpose.setAttribute("readonly", true);
     }
   });
 
   phase.addEventListener("change", function () {
-    if (["NPL", "JIO BP", "IN LEAVE"].includes(phase.value)) {
+    if (["NPL", "JIO BP", "IN LEAVE", "HPCL OFFICE"].includes(phase.value)) {
       region.removeAttribute("readonly");
       roName.removeAttribute("readonly");
       roCode.removeAttribute("maxlength");
@@ -72,7 +82,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // सभी इनपुट फील्ड्स को सेलेक्ट करें
     let requiredFields = [
       roCode,
-      region,
+      document.getElementById("region"),
       roName,
       engineer,
       phase,
@@ -83,7 +93,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // चेक करें कि कोई फील्ड खाली तो नहीं है
     let emptyFields = requiredFields.filter(
-      (field) => field.value.trim() === ""
+      (field) => !field.value || field.value.trim() === ""
     );
 
     if (emptyFields.length > 0) {
@@ -92,6 +102,12 @@ document.addEventListener("DOMContentLoaded", function () {
         text: "सभी फ़ील्ड भरना अनिवार्य है!",
         icon: "warning",
         confirmButtonText: "OK",
+        showClass: {
+          popup: "animate__animated animate__fadeInDown",
+        },
+        hideClass: {
+          popup: "animate__animated animate__fadeOutUp",
+        },
       });
       return; // फॉर्म सबमिट नहीं होगा
     }
@@ -130,11 +146,24 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     )
       .then(() => {
+        let timestamp = new Date().toLocaleString();
         Swal.fire({
           title: "✅ Success!",
-          text: "Your details have been successfully submitted!",
+          text: `Your today plan has been Submitted!\nPlan Submit Time: ${timestamp}`,
           icon: "success",
           confirmButtonText: "OK",
+          timer: 3000, // Auto-close after 3 seconds
+          timerProgressBar: true,
+          showClass: {
+            popup: "animate__animated animate__zoomIn",
+          },
+          hideClass: {
+            popup: "animate__animated animate__zoomOut",
+          },
+          customClass: {
+            popup:
+              "rounded-xl shadow-xl bg-gradient-to-r from-green-400 to-blue-500 text-white",
+          },
         }).then(() => {
           document.querySelectorAll("input, select").forEach((field) => {
             if (field.id !== "date") {
@@ -154,6 +183,12 @@ document.addEventListener("DOMContentLoaded", function () {
           text: "There was an issue submitting your details. Please try again.",
           icon: "error",
           confirmButtonText: "OK",
+          showClass: {
+            popup: "animate__animated animate__shakeX",
+          },
+          hideClass: {
+            popup: "animate__animated animate__fadeOutDown",
+          },
         });
 
         submitBtn.disabled = false;
