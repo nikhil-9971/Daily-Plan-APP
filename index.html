@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Daily Plan Update</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
@@ -11,6 +15,7 @@
         background: linear-gradient(135deg, #667eea, #764ba2);
         font-family: "Poppins", sans-serif;
       }
+
       #submitBtn:hover {
         transform: scale(1.05);
         transition: all 0.3s ease-in-out;
@@ -38,7 +43,7 @@
 
         <div>
           <label class="block font-semibold text-lg text-gray-700"
-            >🏢 RO CODE:</label
+            >📌 RO CODE:</label
           >
           <input
             id="roCode"
@@ -50,7 +55,7 @@
 
         <div>
           <label class="block font-semibold text-lg text-gray-700"
-            >📌 RO NAME:</label
+            >🏢 RO NAME:</label
           >
           <input
             id="roName"
@@ -67,6 +72,7 @@
             id="phase"
             class="w-full p-4 border rounded-xl focus:ring-4 focus:ring-blue-400 shadow-lg bg-white focus:border-indigo-600"
           >
+            <option disabled selected>Select Phase ⬇️</option>
             <option>HPCL/Phase-X</option>
             <option>HPCL/Phase-XI</option>
             <option>HPCL/Phase-XII</option>
@@ -115,6 +121,7 @@
             <option>Power ON</option>
             <option>SAT</option>
             <option>NO PLAN</option>
+            <option>HPCL OFFICE</option>
           </select>
         </div>
 
@@ -152,7 +159,7 @@
       </button>
 
       <p class="text-gray-600 text-center mt-6 font-medium">
-        👨‍💻 Developed By Nikhil Trivedi | Version: 28.02.25
+        👨‍💻 Developed By Nikhil Trivedi | Version: 01.03.25
       </p>
     </div>
 
