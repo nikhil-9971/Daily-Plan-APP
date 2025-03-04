@@ -196,3 +196,27 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   });
 });
+
+// ADD CURRENT DATE TIME FEATURE
+
+function updateDateTime() {
+  const now = new Date();
+  const formattedDateTime = now.toLocaleString("en-IN", {
+    weekday: "long",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  });
+
+  document.getElementById("currentDateTime").innerText = formattedDateTime;
+}
+
+// Function ko har second update karne ke liye setInterval use kiya
+setInterval(updateDateTime, 1000);
+
+// Page load hone par bhi turant date-time update ho jaye
+updateDateTime();
