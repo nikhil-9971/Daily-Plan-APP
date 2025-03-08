@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Visit Data</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+      .spinner {
+        width: 15px;
+        height: 15px;
+        border: 3px solid white;
+        border-top: 3px solid transparent;
+        border-radius: 50%;
+        display: inline-block;
+        animation: spin 1s linear infinite;
+        margin-right: 5px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body class="flex items-center justify-center min-h-screen">
+    <div class="container mx-auto p-6">
+      <!-- Login Modal -->
+      <div
+        id="loginModal"
+        class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 hidden"
+      >
+        <div class="bg-white p-8 rounded-lg shadow-lg w-96 card">
+          <h2 class="text-2xl font-bold mb-4 text-center text-gray-700">
+            🔑 Engineer Login
+          </h2>
+          <input
+            type="text"
+            id="username"
+            placeholder="Enter Username"
+            class="w-full p-3 mb-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            type="password"
+            id="password"
+            placeholder="Enter Password"
+            class="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+
+          <div class="mt-4 text-center">
+            <button
+              id="loginButton"
+              onclick="login()"
+              class="bg-green-500 text-white px-6 py-3 pr-20 pl-20 font-bold rounded-xl hover:bg-blue-700 transition-all"
+            >
+              Login
+            </button>
+          </div>
+          <!-- for Small Screen -->
+          <div class="mt-4 text-center md:block">
+            <a
+              href="index.html"
+              class="visit-detail-link w-full bg-orange-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-blue-700 transition-all"
+            >
+              Go -> Daily Plan App
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <script src="./dashboard.js"></script>
+    </div>
+  </body>
+</html>

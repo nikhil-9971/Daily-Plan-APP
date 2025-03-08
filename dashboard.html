@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Visit Data</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+      .spinner {
+        width: 15px;
+        height: 15px;
+        border: 3px solid white;
+        border-top: 3px solid transparent;
+        border-radius: 50%;
+        display: inline-block;
+        animation: spin 1s linear infinite;
+        margin-right: 5px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+
+  <body class="flex items-center justify-center min-h-screen">
+    <div class="container mx-auto p-6"> 
+
+      <!-- Dashboard -->
+      <div id="dashboardContainer" style="display: none">
+        <div class="bg-white shadow-lg rounded-lg p-6 mb-6 text-center card">
+          <h1 class="text-3xl font-bold text-gray-700">📊 Visit Data Viewer</h1>
+          <!-- Add this inside the dashboardContainer -->
+          <h2 id="welcomeMessage" class="text-xl text-gray-600 m-2"></h2>
+
+        <div class="mt-4 text-center md:block">
+          <a
+            href="login.html"
+            class=" w-full bg-orange-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-blue-700 transition-all"
+            onclick="logout()"
+          >
+          🚪 Logout
+          </a>
+        </div>
+
+        </div>
+
+        <!-- Date Filter -->
+        <div class="bg-white p-6 shadow-lg rounded-lg mb-6 card">
+          <h2 class="text-xl font-semibold mb-4">📅 Filter Data</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <input
+              type="date"
+              id="fromDate"
+              placeholder="From Date"
+              class="p-3 border rounded-lg w-full focus:ring-2 focus:ring-green-500"
+            />
+            <input
+              type="date"
+              id="toDate"
+              placeholder="To Date"
+              class="p-3 border rounded-lg w-full focus:ring-2 focus:ring-green-500"
+            />
+            <button
+              id="fetchbutton"
+              onclick="fetchVisitData()"
+              class="bg-green-500 text-white p-3 rounded-lg hover:bg-green-700 transition-all w-full"
+              onclick="setTimeout(() => location.reload(), 1700);"
+            >
+              Get Visit Detail
+            </button>
+          </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="bg-white p-6 shadow-lg rounded-lg card">
+          <h2 class="text-xl font-semibold mb-4">📄 Visit Records</h2>
+          <div class="overflow-x-auto">
+            <table
+              class="w-full border-collapse border border-gray-300 rounded-lg shadow-md"
+            >
+              <thead>
+                <tr class="bg-gray-300 text-gray-700">
+                  <th class="border p-3">Region</th>
+                  <th class="border p-3">Engineer Name</th>
+                  <th class="border p-3">Phase</th>
+                  <th class="border p-3">RO Code</th>
+                  <th class="border p-3">RO Name</th>
+                  <th class="border p-3">Purpose</th>
+                  <th class="border p-3">Date</th>
+                </tr>
+              </thead>
+              <tbody id="visitData" class="text-center text-gray-600"></tbody>
+            </table>
+          </div>
+          <button
+            onclick="exportData()"
+            class="mt-4 bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-700 transition-all"
+          >
+            ⬇ Export CSV
+          </button>
+        </div>
+      </div>
+    </div>
+    <script src="./dashboard.js"></script>
+  </body>
+</html>
