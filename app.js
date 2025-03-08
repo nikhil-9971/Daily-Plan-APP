@@ -220,3 +220,20 @@ setInterval(updateDateTime, 1000);
 
 // Page load hone par bhi turant date-time update ho jaye
 updateDateTime();
+
+//reload
+
+document.addEventListener("DOMContentLoaded", function () {
+  const visitDetailLinks = document.querySelectorAll(".visit-detail-link");
+
+  visitDetailLinks.forEach((link) => {
+    link.addEventListener("click", function (event) {
+      event.preventDefault(); // लिंक पर तुरंत नेविगेट होने से रोकें
+      const url = this.href; // लिंक का URL सेव करें
+      setTimeout(() => {
+        window.location.href = url; // कुछ सेकंड बाद पेज को रीडायरेक्ट करें
+        setTimeout(() => location.reload(), 3000); // फिर 3 सेकंड बाद रीलोड करें
+      }, 1000); // पहले 1 सेकंड बाद रीडायरेक्ट करें
+    });
+  });
+});
