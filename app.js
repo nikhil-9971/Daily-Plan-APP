@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const submitBtn = document.getElementById("submitBtn");
   const engineer = document.getElementById("engineer");
   const purpose = document.getElementById("purpose");
+  const amcQtr = document.getElementById("amcQtr");
 
   // Set current date as default in Date of Visit field
   const today = new Date().toISOString().split("T")[0];
@@ -16,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
   roCode.addEventListener("input", function () {
     if (roCode.value.length === 8) {
       fetch(
-        `https://script.google.com/macros/s/AKfycbw22jTT7iHCe_qCOXqx0Bzkx_5MZjAigZl17CM29lW1TtDfGfkaWGGK0l3iVOKKlayuoQ/exec?roCode=${roCode.value}`
+        `https://script.google.com/macros/s/AKfycbwoYZHEXzC_JhkrB898pkHxfLpVa_pe2PF6-B_u3xAFDVEvrb6eZPwtt87met7bOe7KmQ/exec?action=getRODetails&roCode=${roCode.value}`
       )
         .then((response) => response.json())
         .then((data) => {
@@ -29,6 +30,23 @@ document.addEventListener("DOMContentLoaded", function () {
             phase.value = data.phase || "";
             phase.setAttribute("disabled", true);
             engineer.value = data.engineer || "";
+            // Fetching AMC Qtr but hiding based on Issue Type
+            let fetchedAMCQtr = data.amcQtr || "Not Found";
+
+            // Validation on Issue Type Selection
+            issueType.addEventListener("change", function () {
+              if (
+                this.value === "PM Visit" ||
+                this.value === "Issue & PM Visit"
+              ) {
+                amcQtr.value = fetchedAMCQtr; // Show fetched value
+              } else {
+                amcQtr.value = "Excluding AMC Visit"; // Set to "-"
+              }
+            });
+
+            // Initially disable AMC Qtr field
+            amcQtr.setAttribute("disabled", true);
           }
         })
         .catch((error) =>
@@ -46,6 +64,8 @@ document.addEventListener("DOMContentLoaded", function () {
       phase.setAttribute("disabled", true);
       issueType.value = "NO PLAN";
       issueType.setAttribute("disabled", true);
+      amcQtr.value = "NO PLAN";
+      amcQtr.setAttribute("readonly", true);
       purpose.value = "NO PLAN";
       purpose.setAttribute("readonly", true);
     }
@@ -130,12 +150,13 @@ document.addEventListener("DOMContentLoaded", function () {
       engineer: engineer.value,
       phase: phase.value,
       issueType: issueType.value,
+      amcQtr: amcQtr.value,
       purpose: purpose.value.toUpperCase(),
       dateOfVisit: dateOfVisit.value,
     };
 
     fetch(
-      "https://script.google.com/macros/s/AKfycbw22jTT7iHCe_qCOXqx0Bzkx_5MZjAigZl17CM29lW1TtDfGfkaWGGK0l3iVOKKlayuoQ/exec",
+      "https://script.google.com/macros/s/AKfycbwoYZHEXzC_JhkrB898pkHxfLpVa_pe2PF6-B_u3xAFDVEvrb6eZPwtt87met7bOe7KmQ/exec?action=saveDailyPlan",
       {
         method: "POST",
         mode: "no-cors",
