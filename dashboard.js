@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
 async function loadEngineers() {
   try {
     let response = await fetch(
-      "https://script.google.com/macros/s/AKfycbyY1Xojtte_Fzk5xS5NBl2uhOjysbH125XuzFZhw5lUS22GL82Bwt3I_PPvPC9SZzvfKA/exec?action=fetchEngineers"
+      "https://script.google.com/macros/s/AKfycbzFJ9mpILRPUKCKMziyMQiT16D3Jp5UhYjvWeObwvmTLF3YkbUHjPhJzT91_xMtCutfeA/exec?action=fetchEngineers"
     );
     let data = await response.json();
     let engineerFilter = document.getElementById("engineerFilter");
@@ -80,7 +80,7 @@ function login() {
   loginButton.innerHTML = '<span class="spinner"></span> Logging in...';
   loginButton.disabled = true;
 
-  let apiUrl = `https://script.google.com/macros/s/AKfycbyY1Xojtte_Fzk5xS5NBl2uhOjysbH125XuzFZhw5lUS22GL82Bwt3I_PPvPC9SZzvfKA/exec?action=login&username=${username}&password=${password}`;
+  let apiUrl = `https://script.google.com/macros/s/AKfycbzFJ9mpILRPUKCKMziyMQiT16D3Jp5UhYjvWeObwvmTLF3YkbUHjPhJzT91_xMtCutfeA/exec?action=login&username=${username}&password=${password}`;
 
   fetch(apiUrl)
     .then((response) => response.json())
@@ -132,7 +132,7 @@ function fetchVisitData() {
   fetchbutton.innerHTML = `<span class="spinner"></span> Fetching Visit Data...`;
   fetchbutton.disabled = true;
 
-  let apiUrl = `https://script.google.com/macros/s/AKfycbyY1Xojtte_Fzk5xS5NBl2uhOjysbH125XuzFZhw5lUS22GL82Bwt3I_PPvPC9SZzvfKA/exec?action=fetchVisitData&from=${encodeURIComponent(
+  let apiUrl = `https://script.google.com/macros/s/AKfycbzFJ9mpILRPUKCKMziyMQiT16D3Jp5UhYjvWeObwvmTLF3YkbUHjPhJzT91_xMtCutfeA/exec?action=fetchVisitData&from=${encodeURIComponent(
     fromDate
   )}&to=${encodeURIComponent(toDate)}&user=${user}`;
 
@@ -174,14 +174,16 @@ function fetchVisitData() {
             )}, false)' class="bg-green-500 text-white px-2 py-1 rounded">Add Status</button>`;
 
         tableBody.innerHTML += `<tr>
-              <td class='border p-2'>${row.region}</td>
-              <td class='border p-2'>${row.engineer}</td>
-              <td class='border p-2'>${row.phase}</td>
-              <td class='border p-2'>${row.roCode}</td>
-              <td class='border p-2'>${row.roName}</td>
-              <td class='border p-2'>${row.purpose}</td>
-              <td class='border p-2'>${formatDate(row.date)}</td>
-              <td class='border p-2'>${statusButton}</td>
+              <td class='p-1 border border-black'>${row.region}</td>
+              <td class='p-1 border border-black'>${row.engineer}</td>
+              <td class='p-1 border border-black'>${row.phase}</td>
+              <td class='p-1 border border-black'>${row.roCode}</td>
+              <td class='p-1 border border-black'>${row.roName}</td>
+              <td class='p-1 border border-black'>${row.purpose}</td>
+              <td class='p-1 border border-black'>${row.issueType}</td>
+              <td class='p-1 border border-black'>${row.amcQtr}</td>
+              <td class='p-1 border border-black'>${formatDate(row.date)}</td>
+              <td class='p-1 border border-black'>${statusButton}</td>
 
             </tr>`;
       });
@@ -204,6 +206,7 @@ function exportData() {
     return;
   }
 
+  let user = localStorage.getItem("loggedInUser");
   let csv = [];
   let rows = table.querySelectorAll("tr");
 
@@ -218,7 +221,7 @@ function exportData() {
   let csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
   let link = document.createElement("a");
   link.href = URL.createObjectURL(csvFile);
-  link.download = `visit_data.csv`;
+  link.download = `${user}_visit_data.csv`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
