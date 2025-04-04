@@ -74,7 +74,7 @@ document
     };
 
     fetch(
-      "https://script.google.com/macros/s/AKfycbyY1Xojtte_Fzk5xS5NBl2uhOjysbH125XuzFZhw5lUS22GL82Bwt3I_PPvPC9SZzvfKA/exec?action=saveUpdateStatus",
+      "https://script.google.com/macros/s/AKfycbzFJ9mpILRPUKCKMziyMQiT16D3Jp5UhYjvWeObwvmTLF3YkbUHjPhJzT91_xMtCutfeA/exec?action=saveUpdateStatus",
       {
         method: "POST",
         mode: "no-cors",
