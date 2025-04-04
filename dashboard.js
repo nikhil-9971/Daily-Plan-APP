@@ -1,15 +1,72 @@
 document.addEventListener("DOMContentLoaded", function () {
   let user = localStorage.getItem("loggedInUser");
+  let role = localStorage.getItem("userRole");
+  let dashboardContainer = document.getElementById("dashboardContainer");
+  let welcomeMessage = document.getElementById("welcomeMessage");
+  let loginModal = document.getElementById("loginModal");
 
-  if (user) {
-    document.getElementById("dashboardContainer").style.display = "block";
-    document.getElementById("welcomeMessage").innerText = `Welcome, ${user}`;
+  if (user && dashboardContainer && welcomeMessage) {
+    dashboardContainer.style.display = "block";
+    welcomeMessage.innerText = `Welcome: ${user} (${role})`;
+
+    if (role === "Admin") {
+      loadEngineers();
+    }
+  } else if (loginModal) {
+    loginModal.classList.remove("hidden");
   } else {
-    document.getElementById("loginModal").classList.remove("hidden");
+    console.error(
+      "❌ Element Not Found: Check 'dashboardContainer' or 'loginModal' in HTML."
+    );
   }
 });
 
-// 🔹 **Login Function**
+// ✅ Engineers List Load Function
+async function loadEngineers() {
+  try {
+    let response = await fetch(
+      "https://script.google.com/macros/s/AKfycbyY1Xojtte_Fzk5xS5NBl2uhOjysbH125XuzFZhw5lUS22GL82Bwt3I_PPvPC9SZzvfKA/exec?action=fetchEngineers"
+    );
+    let data = await response.json();
+    let engineerFilter = document.getElementById("engineerFilter");
+
+    // ✅ Agar engineers list empty hai to error show karein
+    if (!data.engineers || data.engineers.length === 0) {
+      console.error("⚠ No engineers found in API response");
+      return;
+    }
+
+    engineerFilter.innerHTML = '<option value="">All Engineers</option>';
+    data.engineers.forEach((engineer) => {
+      engineerFilter.innerHTML += `<option value="${engineer}">${engineer}</option>`;
+    });
+
+    // console.log("✅ Engineers Loaded:", data.engineers); // ✅ Debugging log
+  } catch (error) {
+    console.error("Error Fetching Engineers List:", error);
+  }
+}
+
+document
+  .getElementById("fetchbutton")
+  .addEventListener("click", fetchVisitData);
+
+// document
+//   .getElementById("engineerFilter")
+//   .addEventListener("change", fetchVisitData);
+
+// ✅ Search Function
+
+document.getElementById("searchInput").addEventListener("keyup", function () {
+  let filter = searchInput.value.toLowerCase();
+  let rows = document.querySelectorAll("#visitData tr");
+  rows.forEach((row) => {
+    let text = row.innerText.toLowerCase();
+    row.style.display = text.includes(filter) ? "" : "none";
+  });
+});
+
+// 🔹 **Login Function with Role Fetching**
 function login() {
   let username = document.getElementById("username").value.trim();
   let password = document.getElementById("password").value.trim();
@@ -23,15 +80,16 @@ function login() {
   loginButton.innerHTML = '<span class="spinner"></span> Logging in...';
   loginButton.disabled = true;
 
-  let apiUrl = `https://script.google.com/macros/s/AKfycbwCJzmc2bjcwjuVxu1KeUadp81WXyNZhn4bsCaGxaH2gaGNg4zTZdhpnGMEeDrYFgr9ew/exec?action=login&username=${username}&password=${password}`;
+  let apiUrl = `https://script.google.com/macros/s/AKfycbyY1Xojtte_Fzk5xS5NBl2uhOjysbH125XuzFZhw5lUS22GL82Bwt3I_PPvPC9SZzvfKA/exec?action=login&username=${username}&password=${password}`;
 
   fetch(apiUrl)
     .then((response) => response.json())
     .then((data) => {
       if (data && data.status === "success") {
-        localStorage.setItem("loggedInUser", username); // ✅ LocalStorage में save करें
+        localStorage.setItem("loggedInUser", username);
+        localStorage.setItem("userRole", data.role); // ✅ Role save karein
         Swal.fire("Success", "Login successful!", "success").then(() => {
-          window.location.href = "dashboard.html"; // ✅ Redirect to Dashboard
+          window.location.href = "dashboard.html";
         });
       } else {
         Swal.fire("Error", data.message || "Invalid credentials", "error");
@@ -52,13 +110,14 @@ function logout() {
   localStorage.removeItem("loggedInUser"); // ✅ Remove user session
   window.location.href = "login.html"; // ✅ Redirect to Login
 }
-
-// 🔹 **Fetch Visit Data**
+// 🔹 **Fetch Visit Data with Role-based Access**
 function fetchVisitData() {
   let fromDate = document.getElementById("fromDate").value;
   let toDate = document.getElementById("toDate").value;
   let fetchbutton = document.getElementById("fetchbutton");
-  let user = localStorage.getItem("loggedInUser"); // ✅ LocalStorage से User लो
+  let engineer = document.getElementById("engineerFilter").value; // 🔹 Selected Engineer
+  let user = localStorage.getItem("loggedInUser");
+  let role = localStorage.getItem("userRole");
 
   if (!fromDate || !toDate) {
     Swal.fire("Warning", "Please select both dates!", "warning");
@@ -73,21 +132,47 @@ function fetchVisitData() {
   fetchbutton.innerHTML = `<span class="spinner"></span> Fetching Visit Data...`;
   fetchbutton.disabled = true;
 
-  let apiUrl = `https://script.google.com/macros/s/AKfycbwCJzmc2bjcwjuVxu1KeUadp81WXyNZhn4bsCaGxaH2gaGNg4zTZdhpnGMEeDrYFgr9ew/exec?action=fetchData&from=${encodeURIComponent(
+  let apiUrl = `https://script.google.com/macros/s/AKfycbyY1Xojtte_Fzk5xS5NBl2uhOjysbH125XuzFZhw5lUS22GL82Bwt3I_PPvPC9SZzvfKA/exec?action=fetchVisitData&from=${encodeURIComponent(
     fromDate
-  )}&to=${encodeURIComponent(toDate)}&user=${encodeURIComponent(user)}`;
+  )}&to=${encodeURIComponent(toDate)}&user=${user}`;
 
   fetch(apiUrl)
     .then((response) => response.json())
     .then((data) => {
+      console.log("API Response:", data); // ✅ Debugging log
       if (!data || data.status === "error") {
         Swal.fire("Error", data.message || "Failed to fetch data!", "error");
         return;
       }
 
+      if (data.length === 0) {
+        Swal.fire("Info", "No visit records found for selected dates!", "info");
+        return;
+      }
+
+      // ✅ **Frontend Filtering (if API doesn't filter correctly)**
+      if (role === "Admin" && engineer && engineer !== "All Engineers") {
+        data = data.filter((row) => row.engineer === engineer);
+      }
+
+      // ✅ **Frontend Filtering (if API doesn't filter correctly)**
+      if (role === "Admin" && engineer && engineer !== "All Engineers") {
+        data = data.filter((row) => row.engineer === engineer);
+      }
+
       let tableBody = document.getElementById("visitData");
       tableBody.innerHTML = "";
       data.forEach((row) => {
+        //add status button
+
+        let statusButton = row.statusSaved
+          ? `<button onclick='openModal(${JSON.stringify(
+              row
+            )}, true)' class="bg-blue-500 text-white px-2 py-1 rounded">View Status</button>`
+          : `<button onclick='openModal(${JSON.stringify(
+              row
+            )}, false)' class="bg-green-500 text-white px-2 py-1 rounded">Add Status</button>`;
+
         tableBody.innerHTML += `<tr>
               <td class='border p-2'>${row.region}</td>
               <td class='border p-2'>${row.engineer}</td>
@@ -96,6 +181,8 @@ function fetchVisitData() {
               <td class='border p-2'>${row.roName}</td>
               <td class='border p-2'>${row.purpose}</td>
               <td class='border p-2'>${formatDate(row.date)}</td>
+              <td class='border p-2'>${statusButton}</td>
+
             </tr>`;
       });
     })
@@ -131,7 +218,7 @@ function exportData() {
   let csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
   let link = document.createElement("a");
   link.href = URL.createObjectURL(csvFile);
-  link.download = "visit_data.csv";
+  link.download = `visit_data.csv`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -145,20 +232,3 @@ function formatDate(isoDate) {
   let day = date.getDate().toString().padStart(2, "0");
   return `${year}-${month}-${day}`; // Output: YYYY-MM-DD
 }
-
-//reload
-
-document.addEventListener("DOMContentLoaded", function () {
-  const visitDetailLinks = document.querySelectorAll(".visit-detail-link");
-
-  visitDetailLinks.forEach((link) => {
-    link.addEventListener("click", function (event) {
-      event.preventDefault(); // लिंक पर तुरंत नेविगेट होने से रोकें
-      const url = this.href; // लिंक का URL सेव करें
-      setTimeout(() => {
-        window.location.href = url; // कुछ सेकंड बाद पेज को रीडायरेक्ट करें
-        setTimeout(() => location.reload(), 3000); // फिर 3 सेकंड बाद रीलोड करें
-      }, 1000); // पहले 1 सेकंड बाद रीडायरेक्ट करें
-    });
-  });
-});
