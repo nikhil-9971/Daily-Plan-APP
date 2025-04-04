@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
   roCode.addEventListener("input", function () {
     if (roCode.value.length === 8) {
       fetch(
-        `https://script.google.com/macros/s/AKfycbwoYZHEXzC_JhkrB898pkHxfLpVa_pe2PF6-B_u3xAFDVEvrb6eZPwtt87met7bOe7KmQ/exec?action=getRODetails&roCode=${roCode.value}`
+        `https://script.google.com/macros/s/AKfycbzFJ9mpILRPUKCKMziyMQiT16D3Jp5UhYjvWeObwvmTLF3YkbUHjPhJzT91_xMtCutfeA/exec?action=getRODetails&roCode=${roCode.value}`
       )
         .then((response) => response.json())
         .then((data) => {
@@ -73,7 +73,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   phase.addEventListener("change", function () {
     if (["NPL", "JIO BP", "IN LEAVE", "HPCL OFFICE"].includes(phase.value)) {
-      region.removeAttribute("readonly");
+      convertRegionToDropdown();
+      // region.removeAttribute("readonly");
       roName.removeAttribute("readonly");
       roCode.removeAttribute("maxlength");
     } else {
@@ -156,7 +157,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     fetch(
-      "https://script.google.com/macros/s/AKfycbwoYZHEXzC_JhkrB898pkHxfLpVa_pe2PF6-B_u3xAFDVEvrb6eZPwtt87met7bOe7KmQ/exec?action=saveDailyPlan",
+      "https://script.google.com/macros/s/AKfycbzFJ9mpILRPUKCKMziyMQiT16D3Jp5UhYjvWeObwvmTLF3YkbUHjPhJzT91_xMtCutfeA/exec?action=saveDailyPlan",
       {
         method: "POST",
         mode: "no-cors",
