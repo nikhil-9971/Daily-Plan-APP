@@ -28,7 +28,6 @@
         }
       }
     </style>
-
   <body class="flex items-center justify-center min-h-screen">
     <div class="container mx-auto p-6"> 
 
@@ -36,45 +35,26 @@
       <div id="dashboardContainer" style="display: none">
         <div class="bg-white shadow-lg rounded-lg p-6 mb-6 text-center card">
           <h1 class="text-3xl font-bold text-gray-700">📊 Visit Data Viewer</h1>
-          <!-- Add this inside the dashboardContainer -->
-          <h2 id="welcomeMessage" class="text-xl text-gray-600 m-2"></h2>
+          <h2 id="welcomeMessage" class="text-lg font-medium  text-gray-600 m-2"></h2>
 
-        <div class="mt-4 text-center md:block">
-          <a
-            href="login.html"
-            class=" w-full bg-orange-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-blue-700 transition-all"
-            onclick="logout()"
-          >
-          🚪 Logout
-          </a>
-        </div>
-
+          <div class="mt-4 text-center md:block">
+            <a href="login.html" class=" w-full bg-orange-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-blue-700 transition-all" onclick="logout()">
+              🚪 Logout
+            </a>
+          </div>
         </div>
 
         <!-- Date Filter -->
         <div class="bg-white p-6 shadow-lg rounded-lg mb-6 card">
           <h2 class="text-xl font-semibold mb-4">📅 Filter Data</h2>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <input
-              type="date"
-              id="fromDate"
-              placeholder="From Date"
-              class="p-3 border rounded-lg w-full focus:ring-2 focus:ring-green-500"
-            />
-            <input
-              type="date"
-              id="toDate"
-              placeholder="To Date"
-              class="p-3 border rounded-lg w-full focus:ring-2 focus:ring-green-500"
-            />
-            <button
-              id="fetchbutton"
-              onclick="fetchVisitData()"
-              class="bg-green-500 text-white p-3 rounded-lg hover:bg-green-700 transition-all w-full"
-              onclick="setTimeout(() => location.reload(), 1700);"
-            >
-              Get Visit Detail
-            </button>
+            <input type="date" id="fromDate" class="p-3 border rounded-lg w-full focus:ring-2 focus:ring-green-500" onfocus="(this.type='date')" onblur="(this.type='text')" placeholder="From Date"/>
+            <input type="date" id="toDate" class="p-3 border rounded-lg w-full focus:ring-2 focus:ring-green-500" onfocus="(this.type='date')" onblur="(this.type='text')" placeholder="To Date" />
+            <input type="text" id="searchInput" placeholder="Search by Engineer or RO Code" class="p-3 border rounded-lg w-full focus:ring-2 focus:ring-green-500" />
+            <select id="engineerFilter" class="p-3 border rounded-lg w-full focus:ring-2 focus:ring-green-500">
+              <option value="all">All Engineers</option>
+            </select>
+            <button id="fetchbutton" onclick="fetchVisitData()" class="bg-green-500 text-white p-3 rounded-lg hover:bg-green-700 transition-all w-full">Get Visit Detail</button>
           </div>
         </div>
 
@@ -82,9 +62,7 @@
         <div class="bg-white p-6 shadow-lg rounded-lg card">
           <h2 class="text-xl font-semibold mb-4">📄 Visit Records</h2>
           <div class="overflow-x-auto">
-            <table
-              class="w-full border-collapse border border-gray-300 rounded-lg shadow-md"
-            >
+            <table class="w-full border-collapse border border-gray-300 rounded-lg shadow-md">
               <thead>
                 <tr class="bg-gray-300 text-gray-700">
                   <th class="border p-3">Region</th>
@@ -94,20 +72,166 @@
                   <th class="border p-3">RO Name</th>
                   <th class="border p-3">Purpose</th>
                   <th class="border p-3">Date</th>
+                  <th class="border p-3">Update Status</th>
+                 
                 </tr>
               </thead>
               <tbody id="visitData" class="text-center text-gray-600"></tbody>
             </table>
           </div>
-          <button
-            onclick="exportData()"
-            class="mt-4 bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-700 transition-all"
-          >
-            ⬇ Export CSV
-          </button>
+          <button onclick="exportData()" class="mt-4 bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-700 transition-all">⬇ Export CSV</button>
         </div>
       </div>
     </div>
-    <script src="./dashboard.js"></script>
+
+    
+
+     <!-- Status Update Modal -->
+
+     <div id="statusModal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
+      <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+          <h2 class="text-xl font-semibold mb-4">Update Site Status</h2>
+
+     <div class="grid grid-cols-2 gap-4">    <!-- Read-Only Fields -->
+      <div class="mb-2">
+         <label class="block font-medium">Engineer Name:</label>
+         <input type="text" id="engineerName" class="w-full p-2 border rounded bg-gray-100" readonly>
+      </div>
+
+      <div class="mb-2">
+         <label class="block font-medium">RO Code:</label>
+         <input type="text" id="roCode" class="w-full p-2 border rounded bg-gray-100" readonly>
+      </div>
+
+      <div class="mb-2">
+        <label class="block font-medium">RO Name:</label>
+        <input type="text" id="roName" class="w-full p-2 border rounded bg-gray-100" readonly>
+      </div>
+
+    <div class="mb-2">
+        <label class="block font-medium">Visit Date:</label>
+        <input type="text" id="visitDate" class="w-full p-2 border rounded bg-gray-100" readonly>
+    </div>
+  </div>
+
+
+  <h2 class="text-lg font-semibold mb-4 underline text-blue-600">Fill all details</h2>
+          <form id="statusForm" class="grid grid-cols-2 gap-4">
+              <div>
+                  <label class="block font-medium">Probe Make</label>
+                  <select class="w-full p-2 border rounded" id="probeMake">
+                    <option>SI</option>
+                    <option>SBEM</option>
+                    <option>Alisonic</option>
+                  </select>
+              </div>
+              <div>
+                  <label class="block font-medium">Low Product Lock Set</label>
+                  <select class="w-full p-2 border rounded" id="lowProductLock">
+                    <option>350mm/STP</option>
+                    <option>150mm/Non STP</option>
+                    <option>350mm&150mm /Non STP</option>
+                  </select>
+              </div>
+              <div>
+                  <label class="block font-medium">High Water Set at 50mm</label>
+                  <select class="w-full p-2 border rounded" id="highWaterSet">
+                    <option>Yes</option>
+                    <option>No</option>
+                  </select>
+
+              </div>
+              <div>
+                  <label class="block font-medium">All DU Serial Number</label>
+                  <input type="text" class="w-full p-2 border rounded" id="duSerialNumber">
+              </div>
+              <div>
+                  <label class="block font-medium">Connectivity Type</label>
+                  <select class="w-full p-2 border rounded" id="connectivityType">
+                      <option>VSAT</option>
+                      <option>Broadband</option>
+                      <option>SIM</option>
+                      <option>RELCON SIM</option>
+                  </select>
+              </div>
+              <div>
+                  <label class="block font-medium">SIM-1 Service Provider</label>
+                  <select class="w-full p-2 border rounded" id="sim1Provider">
+                      <option>JIO</option>
+                      <option>AIRTEL</option>
+                      <option>VI</option>
+                      <option>NA</option>
+                  </select>
+              </div>
+              <div>
+                  <label class="block font-medium">SIM 1 Number</label>
+                  <input type="text" class="w-full p-2 border rounded" id="sim1Number">
+              </div>
+              <div>
+                  <label class="block font-medium">SIM-2 Service Provider</label>
+                  <select class="w-full p-2 border rounded" id="sim2Provider">
+                      <option>JIO</option>
+                      <option>AIRTEL</option>
+                      <option>VI</option>
+                      <option>NA</option>
+                  </select>
+              </div>
+              <div>
+                  <label class="block font-medium">SIM 2 Number</label>
+                  <input type="text" class="w-full p-2 border rounded" id="sim2Number">
+              </div>
+              <div>
+                  <label class="block font-medium">IEMI Number</label>
+                  <input type="text" class="w-full p-2 border rounded" id="iemiNumber">
+              </div>
+              <div>
+                  <label class="block font-medium">BOS Version with Date</label>
+                  <input type="text" class="w-full p-2 border rounded" id="bosVersion">
+              </div>
+              <div>
+                  <label class="block font-medium">FCC Version with Date</label>
+                  <input type="text" class="w-full p-2 border rounded" id="fccVersion">
+              </div>
+              <div class="col-span-2">
+                  <label class="block font-medium">Wireless Slave Version</label>
+                  <textarea class="w-full p-2 border rounded" id="wirelessSlave"></textarea>
+              </div>
+              <div>
+                  <label class="block font-medium">SFTP Config</label>
+                  <select class="w-full p-2 border rounded" id="sftpConfig">
+                      <option>Yes</option>
+                      <option>No</option>
+                  </select>
+              </div>
+              <div>
+                  <label class="block font-medium">Admin Password Updated</label>
+                  <select class="w-full p-2 border rounded" id="adminPassword">
+                      <option>Yes</option>
+                      <option>No</option>
+                  </select>
+              </div>
+
+              <div>
+                <label class="block font-medium">Work Completion Status</label>
+                <select class="w-full p-2 border rounded" id="workCompletion">
+                    <option>Partial</option>
+                    <option>All</option>
+                </select>
+            </div>
+
+              <div class="col-span-2">
+                  <label class="block font-medium">Earthing Status</label>
+                  <textarea class="w-full p-2 border rounded" id="earthingStatus"></textarea>
+              </div>
+              <div class="col-span-2 flex justify-end space-x-2 mt-4">
+                  <button type="button" class="px-4 py-2 bg-gray-500 text-white rounded" onclick="closeStatusModal()">Cancel</button>
+                  <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded" id="saveBtn">Save</button>
+              </div>
+          </form>
+      </div>
+  </div>
+  
+    <script src="./statusmodel.js"></script>
+    <script src="./dashboardacc.js"></script>
   </body>
 </html>
