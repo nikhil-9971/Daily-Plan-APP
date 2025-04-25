@@ -1,38 +1,36 @@
-let isViewOnly = false; // Default to false
+// Combined Logic for Enhanced Dashboard Behavior
 
-function openModal(rowData, isViewOnly) {
+function openModal(rowData, isViewOnly = false) {
   const modal = document.getElementById("statusModal");
-  if (!modal) {
-    console.error("Modal not found!");
+  if (!modal || !rowData) {
+    console.error("Modal or row data missing");
     return;
   }
   modal.classList.remove("hidden");
 
-  if (!rowData) {
-    console.error("Row data not provided!");
-    return;
-  }
-
+  // Fill fields
   document.getElementById("engineerName").value = rowData.engineer || "";
   document.getElementById("roCode").value = rowData.roCode || "";
   document.getElementById("roName").value = rowData.roName || "";
   document.getElementById("visitDate").value = rowData.date || "";
-}
 
-if (isViewOnly) {
-  document
-    .querySelectorAll("#statusForm input, #statusForm select")
-    .forEach((input) => {
-      input.setAttribute("disabled", "true");
-    });
-  document.getElementById("saveBtn").classList.add("hidden");
-} else {
-  document
-    .querySelectorAll("#statusForm input, #statusForm select")
-    .forEach((input) => {
-      input.removeAttribute("disabled");
-    });
-  document.getElementById("saveBtn").classList.remove("hidden");
+  // Clear fields if adding
+  if (!isViewOnly) {
+    document.getElementById("statusForm").reset();
+  }
+
+  // Disable all fields if view only
+  const formElements = document.querySelectorAll(
+    "#statusForm input, #statusForm select, #statusForm textarea"
+  );
+  formElements.forEach((el) => {
+    el.disabled = isViewOnly;
+  });
+
+  // Hide Save button in view mode
+  document.getElementById("saveBtn").style.display = isViewOnly
+    ? "none"
+    : "inline-block";
 }
 
 function closeStatusModal() {
@@ -40,8 +38,6 @@ function closeStatusModal() {
 }
 
 const saveBtn = document.getElementById("saveBtn");
-
-// Handle form submission
 document
   .getElementById("statusForm")
   .addEventListener("submit", function (event) {
@@ -49,6 +45,7 @@ document
 
     saveBtn.disabled = true;
     saveBtn.innerText = "Saving... ⏳";
+
     const statusData = {
       engineer: document.getElementById("engineerName").value,
       roCode: document.getElementById("roCode").value,
@@ -71,26 +68,51 @@ document
       adminPassword: document.getElementById("adminPassword").value,
       workCompletion: document.getElementById("workCompletion").value,
       earthingStatus: document.getElementById("earthingStatus").value,
+      duOffline: document.getElementById("duOffline").value,
+      duRemark: document.getElementById("duRemark").value,
     };
 
     fetch(
-      "https://script.google.com/macros/s/AKfycbzFJ9mpILRPUKCKMziyMQiT16D3Jp5UhYjvWeObwvmTLF3YkbUHjPhJzT91_xMtCutfeA/exec?action=saveUpdateStatus",
+      "https://script.google.com/macros/s/AKfycbymE1Hjtj0prXw0HkuvWpSdriDDwoECVv01VhzSq5dqjvIXOZajYMnxCUBGstPgCZx7kA/exec?action=saveUpdateStatus",
       {
         method: "POST",
         mode: "no-cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(statusData),
       }
     )
       .then(() => {
         Swal.fire("Success", "Status Updated Successfully!", "success");
+
         closeStatusModal();
+        saveBtn.disabled = false;
+        saveBtn.innerText = "Save";
+        // Replace Add Status with Download File
+        replaceButtonToDownload(statusData);
       })
       .catch(() => {
         Swal.fire("Error", "Failed to Update Status", "error");
-        document.getElementById("saveBtn").disabled = false;
-        document.getElementById("saveBtn").innerText = "Submit";
+        saveBtn.disabled = false;
+        saveBtn.innerText = "Submit";
       });
   });
+
+function replaceButtonToDownload(rowData) {
+  const rows = document.querySelectorAll("#visitData tr");
+
+  rows.forEach((row) => {
+    const cells = row.querySelectorAll("td");
+    const roCodeCell = cells[3]?.innerText?.trim();
+    const dateCell = cells[8]?.innerText?.trim();
+
+    if (roCodeCell === rowData.roCode && dateCell === rowData.visitDate) {
+      const btn = row.querySelector("button");
+      if (btn && btn.innerText === "Add Status") {
+        btn.innerText = "Download File";
+        btn.className = "bg-blue-600 text-white px-2 py-1 rounded";
+        btn.disabled = false;
+        btn.onclick = () => generatePDF(rowData);
+      }
+    }
+  });
+}
