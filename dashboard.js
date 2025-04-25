@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
 async function loadEngineers() {
   try {
     let response = await fetch(
-      "https://script.google.com/macros/s/AKfycbzFJ9mpILRPUKCKMziyMQiT16D3Jp5UhYjvWeObwvmTLF3YkbUHjPhJzT91_xMtCutfeA/exec?action=fetchEngineers"
+      "https://script.google.com/macros/s/AKfycbymE1Hjtj0prXw0HkuvWpSdriDDwoECVv01VhzSq5dqjvIXOZajYMnxCUBGstPgCZx7kA/exec?action=fetchEngineers"
     );
     let data = await response.json();
     let engineerFilter = document.getElementById("engineerFilter");
@@ -80,7 +80,7 @@ function login() {
   loginButton.innerHTML = '<span class="spinner"></span> Logging in...';
   loginButton.disabled = true;
 
-  let apiUrl = `https://script.google.com/macros/s/AKfycbzFJ9mpILRPUKCKMziyMQiT16D3Jp5UhYjvWeObwvmTLF3YkbUHjPhJzT91_xMtCutfeA/exec?action=login&username=${username}&password=${password}`;
+  let apiUrl = `https://script.google.com/macros/s/AKfycbymE1Hjtj0prXw0HkuvWpSdriDDwoECVv01VhzSq5dqjvIXOZajYMnxCUBGstPgCZx7kA/exec?action=login&username=${username}&password=${password}`;
 
   fetch(apiUrl)
     .then((response) => response.json())
@@ -132,7 +132,7 @@ function fetchVisitData() {
   fetchbutton.innerHTML = `<span class="spinner"></span> Fetching Visit Data...`;
   fetchbutton.disabled = true;
 
-  let apiUrl = `https://script.google.com/macros/s/AKfycbzFJ9mpILRPUKCKMziyMQiT16D3Jp5UhYjvWeObwvmTLF3YkbUHjPhJzT91_xMtCutfeA/exec?action=fetchVisitData&from=${encodeURIComponent(
+  let apiUrl = `https://script.google.com/macros/s/AKfycbymE1Hjtj0prXw0HkuvWpSdriDDwoECVv01VhzSq5dqjvIXOZajYMnxCUBGstPgCZx7kA/exec?action=fetchVisitData&from=${encodeURIComponent(
     fromDate
   )}&to=${encodeURIComponent(toDate)}&user=${user}`;
 
@@ -155,20 +155,11 @@ function fetchVisitData() {
         data = data.filter((row) => row.engineer === engineer);
       }
 
-      // ✅ **Frontend Filtering (if API doesn't filter correctly)**
-      if (role === "Admin" && engineer && engineer !== "All Engineers") {
-        data = data.filter((row) => row.engineer === engineer);
-      }
-
       let tableBody = document.getElementById("visitData");
       tableBody.innerHTML = "";
       data.forEach((row) => {
-        //add status button
-
-        let statusButton = row.statusSaved
-          ? `<button onclick='openModal(${JSON.stringify(
-              row
-            )}, true)' class="bg-blue-500 text-white px-2 py-1 rounded">View Status</button>`
+        let statusButton = row.statusAvailable
+          ? `<button onclick='generatePDF("${row.roCode}", "${row.date}")' class="bg-blue-600 text-white px-2 py-1 rounded">Download File</button>`
           : `<button onclick='openModal(${JSON.stringify(
               row
             )}, false)' class="bg-green-500 text-white px-2 py-1 rounded">Add Status</button>`;
@@ -234,4 +225,130 @@ function formatDate(isoDate) {
   let month = (date.getMonth() + 1).toString().padStart(2, "0");
   let day = date.getDate().toString().padStart(2, "0");
   return `${year}-${month}-${day}`; // Output: YYYY-MM-DD
+}
+
+async function fetchStatusData(roCode, visitDate) {
+  const apiUrl = `https://script.google.com/macros/s/AKfycbymE1Hjtj0prXw0HkuvWpSdriDDwoECVv01VhzSq5dqjvIXOZajYMnxCUBGstPgCZx7kA/exec?action=getStatus&roCode=${encodeURIComponent(
+    roCode
+  )}&visitDate=${encodeURIComponent(visitDate)}`;
+
+  const response = await fetch(apiUrl);
+  const data = await response.json();
+  return data;
+  // console.log(data);
+}
+
+// Generate Pdf
+async function generatePDF(roCode, visitDate) {
+  try {
+    const response = await fetchStatusData(roCode, visitDate);
+    if (!response || response.status !== "success" || !response.data) {
+      Swal.fire("Not Found", "Status not available for this visit.", "info");
+      return;
+    }
+
+    const data = response.data;
+
+    const fieldLabelMap = {
+      engineer: "Engineer Name",
+      roCode: "RO Code",
+      roName: "RO Name",
+      visitDate: "Visit Date",
+      probeMake: "Probe Make",
+      lowProductLock: "Low Product Lock Set",
+      highWaterSet: "High Water Set at 50mm",
+      duSerialNumber: "All DU Serial Number",
+      connectivityType: "Connectivity Type",
+      sim1Provider: "SIM-1 Service Provider",
+      sim1Number: "SIM 1 Number",
+      sim2Provider: "SIM-2 Service Provider",
+      sim2Number: "SIM 2 Number",
+      iemiNumber: "IEMI Number",
+      bosVersion: "BOS Version with Date",
+      fccVersion: "FCC Version with Date",
+      wirelessSlave: "Wireless Slave Version",
+      sftpConfig: "SFTP Config",
+      adminPassword: "Admin Password Updated",
+      workCompletion: "Work Completion Status",
+      earthingStatus: "Earthing Status",
+      duOffline: "No of DU offline",
+      duRemark: "Reason for DU offline",
+    };
+
+    // HTML content with custom styles
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+        <style>
+          table { width: 100%; border-collapse: collapse; font-size: 11px; }
+          th, td { border: 1px solid #ccc; padding: 6px; }
+          th { background-color: #d9edf7; }
+          tr { page-break-inside: avoid; }
+        </style>
+
+        <h2 style="text-align: center; margin-bottom: 20px; font-weight: bold; font-size: 18px;">
+          RELCON Bihar Site Visit Status Report
+        </h2>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${Object.keys(fieldLabelMap)
+              .map(
+                (key) => `
+                  <tr>
+                    <td>${fieldLabelMap[key]}</td>
+                    <td>${data[key] || ""}</td>
+                  </tr>
+                `
+              )
+              .join("")}
+          </tbody>
+        </table>
+
+        <div style="margin-top: 30px; font-size: 10px;">
+          <p><strong>Generated by:</strong> ${localStorage.getItem(
+            "loggedInUser"
+          )}</p>
+          <p><strong>Generated on:</strong> ${new Date().toLocaleString(
+            "en-IN"
+          )}</p>
+          <p style="margin-top: 30px;"><strong>Signature:</strong> ___________________________</p>
+        </div>
+      </div>
+    `;
+
+    const element = document.createElement("div");
+    element.innerHTML = htmlContent;
+
+    await html2pdf()
+      .set({
+        margin: 0.2,
+        filename: `${roCode}_${visitDate}_Status.pdf`,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          scrollY: 0,
+          useCORS: true,
+        },
+        jsPDF: {
+          unit: "in",
+          format: "a4",
+          orientation: "portrait",
+        },
+        pagebreak: {
+          mode: ["css", "legacy"],
+          avoid: ["tr", "td"],
+        },
+      })
+      .from(element)
+      .save();
+  } catch (error) {
+    console.error("PDF Generation Error:", error);
+    Swal.fire("Error", "Failed to generate PDF.", "error");
+  }
 }
