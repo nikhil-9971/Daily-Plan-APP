@@ -7,6 +7,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+
+
+
     <style>
       .spinner {
         width: 15px;
@@ -34,7 +41,7 @@
       <!-- Dashboard -->
       <div id="dashboardContainer" style="display: none">
         <div class="bg-white shadow-lg rounded-lg p-6 mb-6 text-center card">
-          <h1 class="text-3xl font-bold text-gray-700">📊 Visit Data Viewer</h1>
+          <h1 class="text-3xl font-bold text-gray-700">📊 RELCON Visit Record</h1>
           <h2 id="welcomeMessage" class="text-lg font-medium  text-gray-600 m-2"></h2>
 
           <div class="mt-4 text-center md:block">
@@ -120,11 +127,11 @@
   </div>
 
 
-  <h2 class="text-lg font-semibold mb-4 underline text-blue-600">Fill all details</h2>
+  <h2 class="text-lg font-semibold mb-4 underline text-red-600">Fill all details</h2>
           <form id="statusForm" class="grid grid-cols-2 gap-4">
               <div>
                   <label class="block font-medium">Probe Make</label>
-                  <select class="w-full p-2 border rounded" id="probeMake">
+                  <select class="w-full p-2 border rounded" id="probeMake" required>
                     <option>SI</option>
                     <option>SBEM</option>
                     <option>Alisonic</option>
@@ -132,7 +139,7 @@
               </div>
               <div>
                   <label class="block font-medium">Low Product Lock Set</label>
-                  <select class="w-full p-2 border rounded" id="lowProductLock">
+                  <select class="w-full p-2 border rounded" id="lowProductLock" required>
                     <option>350mm/STP</option>
                     <option>150mm/Non STP</option>
                     <option>350mm&150mm /Non STP</option>
@@ -147,70 +154,83 @@
 
               </div>
               <div>
-                  <label class="block font-medium">All DU Serial Number</label>
-                  <input type="text" class="w-full p-2 border rounded" id="duSerialNumber">
+                  <label class="block font-medium">All DU Serial Number Updated</label>
+                  <select class="w-full p-2 border rounded" id="duSerialNumber" required>
+                    <option>Yes</option>
+                    <option>No</option>
+                </select>
               </div>
               <div>
                   <label class="block font-medium">Connectivity Type</label>
-                  <select class="w-full p-2 border rounded" id="connectivityType">
+                  <select class="w-full p-2 border rounded" id="connectivityType" required>
                       <option>VSAT</option>
                       <option>Broadband</option>
                       <option>SIM</option>
                       <option>RELCON SIM</option>
+                      <option>SDWAN</option>
                   </select>
               </div>
               <div>
                   <label class="block font-medium">SIM-1 Service Provider</label>
-                  <select class="w-full p-2 border rounded" id="sim1Provider">
+                  <select class="w-full p-2 border rounded" id="sim1Provider" required>
+                      <option>NA</option>
                       <option>JIO</option>
                       <option>AIRTEL</option>
                       <option>VI</option>
-                      <option>NA</option>
+                      
                   </select>
               </div>
               <div>
                   <label class="block font-medium">SIM 1 Number</label>
-                  <input type="text" class="w-full p-2 border rounded" id="sim1Number">
+                  <input type="text" class="w-full p-2 border rounded" id="sim1Number" required>
               </div>
               <div>
                   <label class="block font-medium">SIM-2 Service Provider</label>
-                  <select class="w-full p-2 border rounded" id="sim2Provider">
+                  <select class="w-full p-2 border rounded" id="sim2Provider" required>
+                      <option>NA</option>
                       <option>JIO</option>
                       <option>AIRTEL</option>
                       <option>VI</option>
-                      <option>NA</option>
+                      
                   </select>
               </div>
               <div>
                   <label class="block font-medium">SIM 2 Number</label>
-                  <input type="text" class="w-full p-2 border rounded" id="sim2Number">
+                  <input type="text" class="w-full p-2 border rounded" id="sim2Number" required>
               </div>
               <div>
                   <label class="block font-medium">IEMI Number</label>
-                  <input type="text" class="w-full p-2 border rounded" id="iemiNumber">
+                  <input type="text" class="w-full p-2 border rounded" id="iemiNumber" required>
               </div>
               <div>
                   <label class="block font-medium">BOS Version with Date</label>
-                  <input type="text" class="w-full p-2 border rounded" id="bosVersion">
+                  <select class="w-full p-2 border rounded" id="bosVersion" required>
+                    <option>1.0.30(01-Nov-2023)</option>
+                    <option>1.0.5(08-Jul-2024)</option>
+                </select>
+                  
               </div>
               <div>
                   <label class="block font-medium">FCC Version with Date</label>
-                  <input type="text" class="w-full p-2 border rounded" id="fccVersion">
+                  <select class="w-full p-2 border rounded" id="fccVersion" required>
+                    <option>1.0.30(01-Nov-2023)</option>
+                    <option>1.0.5(08-Jul-2024)</option>
+                </select>
               </div>
               <div class="col-span-2">
                   <label class="block font-medium">Wireless Slave Version</label>
-                  <textarea class="w-full p-2 border rounded" id="wirelessSlave"></textarea>
+                  <textarea class="w-full p-2 border rounded" id="wirelessSlave" required placeholder="Example: 1- 02.00.60, 2-03.00.70"></textarea>
               </div>
               <div>
                   <label class="block font-medium">SFTP Config</label>
-                  <select class="w-full p-2 border rounded" id="sftpConfig">
+                  <select class="w-full p-2 border rounded" id="sftpConfig" required>
                       <option>Yes</option>
                       <option>No</option>
                   </select>
               </div>
               <div>
                   <label class="block font-medium">Admin Password Updated</label>
-                  <select class="w-full p-2 border rounded" id="adminPassword">
+                  <select class="w-full p-2 border rounded" id="adminPassword" required>
                       <option>Yes</option>
                       <option>No</option>
                   </select>
@@ -218,7 +238,7 @@
 
               <div>
                 <label class="block font-medium">Work Completion Status</label>
-                <select class="w-full p-2 border rounded" id="workCompletion">
+                <select class="w-full p-2 border rounded" id="workCompletion" required>
                     <option>Partial</option>
                     <option>All</option>
                 </select>
@@ -226,17 +246,55 @@
 
               <div class="col-span-2">
                   <label class="block font-medium">Earthing Status</label>
-                  <textarea class="w-full p-2 border rounded" id="earthingStatus"></textarea>
+                  <textarea class="w-full p-2 border rounded" id="earthingStatus" required placeholder="Example: Earthing is Ok/Not PN = 234V, PE = 233V, NE = 1V"></textarea></textarea>
               </div>
+
+
+            <div class="flex items-start gap-4 mt-2">
+              <!-- No of DU Offline -->
+              <div class="w-36">
+                <label class="block font-medium mb-1">No of DU Offline</label>
+                <select class="w-full p-2 border rounded" id="duOffline" required>
+                  <option>ALL OK</option>
+                  <option>1</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>4</option>
+                  <option>ALL DU ISSUE</option>
+                </select>
+              </div>
+            
+              <!-- Reason for DU Offline -->
+              <div class="flex-1">
+                <label class="block font-medium mb-1">Reason for DU offline</label>
+                <textarea
+                  class="w-full p-2 border rounded"
+                  id="duRemark"
+                  required
+                  placeholder="Remark: DU-01 - DU POS Card Issue"
+                  rows="3"
+                ></textarea>
+              </div>
+            </div>
+            
+
+ 
+            
+
+
               <div class="col-span-2 flex justify-end space-x-2 mt-4">
                   <button type="button" class="px-4 py-2 bg-gray-500 text-white rounded" onclick="closeStatusModal()">Cancel</button>
                   <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded" id="saveBtn">Save</button>
               </div>
           </form>
+
+      
+
+
       </div>
   </div>
   
     <script src="./statusmodel.js"></script>
-    <script src="./dashboard.js"></script>
+    <script src="./dashboardacc.js"></script>
   </body>
 </html>
