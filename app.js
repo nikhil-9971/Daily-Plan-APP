@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
   roCode.addEventListener("input", function () {
     if (roCode.value.length === 8) {
       fetch(
-        `https://script.google.com/macros/s/AKfycbzFJ9mpILRPUKCKMziyMQiT16D3Jp5UhYjvWeObwvmTLF3YkbUHjPhJzT91_xMtCutfeA/exec?action=getRODetails&roCode=${roCode.value}`
+        `https://script.google.com/macros/s/AKfycbymE1Hjtj0prXw0HkuvWpSdriDDwoECVv01VhzSq5dqjvIXOZajYMnxCUBGstPgCZx7kA/exec?action=getRODetails&roCode=${roCode.value}`
       )
         .then((response) => response.json())
         .then((data) => {
@@ -157,7 +157,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     fetch(
-      "https://script.google.com/macros/s/AKfycbzFJ9mpILRPUKCKMziyMQiT16D3Jp5UhYjvWeObwvmTLF3YkbUHjPhJzT91_xMtCutfeA/exec?action=saveDailyPlan",
+      "https://script.google.com/macros/s/AKfycbymE1Hjtj0prXw0HkuvWpSdriDDwoECVv01VhzSq5dqjvIXOZajYMnxCUBGstPgCZx7kA/exec?action=saveDailyPlan",
       {
         method: "POST",
         mode: "no-cors",
