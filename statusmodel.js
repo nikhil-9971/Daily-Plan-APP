@@ -152,8 +152,8 @@ function replaceButtonToDownload(rowData) {
     if (roCodeCell === rowData.roCode && dateCell === rowData.visitDate) {
       const btn = row.querySelector("button");
       if (btn && btn.innerText === "Add Status") {
-        btn.innerText = "Download File";
-        btn.className = "bg-blue-600 text-white px-2 py-1 rounded";
+        btn.innerText = "Download Status";
+        btn.className = "bg-red-600 text-white px-2 py-1 rounded";
         btn.disabled = false;
         btn.onclick = () => generatePDF(rowData);
       }
