@@ -159,7 +159,7 @@ function fetchVisitData() {
       tableBody.innerHTML = "";
       data.forEach((row) => {
         let statusButton = row.statusAvailable
-          ? `<button onclick='generatePDF("${row.roCode}", "${row.date}")' class="bg-blue-600 text-white px-2 py-1 rounded">Download Status</button>`
+          ? `<button onclick='generatePDF("${row.roCode}", "${row.date}")' class="bg-red-600 text-white px-2 py-1 rounded">Download Status</button>`
           : `<button onclick='openModal(${JSON.stringify(
               row
             )}, false)' class="bg-green-500 text-white px-2 py-1 rounded">Add Status</button>`;
