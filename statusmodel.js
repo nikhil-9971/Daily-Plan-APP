@@ -52,6 +52,12 @@ function openModal(rowData, isViewOnly = false) {
       }
     });
 
+  //Capital Letter
+  document.querySelectorAll("textarea").forEach((el) => {
+    el.addEventListener("input", function () {
+      this.value = this.value.toUpperCase();
+    });
+  });
   // Clear fields if adding
   if (!isViewOnly) {
     document.getElementById("statusForm").reset();
