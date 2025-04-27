@@ -14,6 +14,44 @@ function openModal(rowData, isViewOnly = false) {
   document.getElementById("roName").value = rowData.roName || "";
   document.getElementById("visitDate").value = rowData.date || "";
 
+  document
+    .getElementById("connectivityType")
+    .addEventListener("change", function () {
+      const selected = this.value;
+
+      const sim1Provider = document.getElementById("sim1Provider");
+      const sim1Number = document.getElementById("sim1Number");
+      const sim2Provider = document.getElementById("sim2Provider");
+      const sim2Number = document.getElementById("sim2Number");
+      const iemiNumber = document.getElementById("iemiNumber");
+
+      if (selected !== "RELCON SIM") {
+        sim1Provider.value = "NA";
+        sim1Number.value = "NA";
+        sim2Provider.value = "NA";
+        sim2Number.value = "NA";
+        iemiNumber.value = "NA";
+
+        sim1Provider.setAttribute("disabled", true);
+        sim1Number.setAttribute("disabled", true);
+        sim2Provider.setAttribute("disabled", true);
+        sim2Number.setAttribute("disabled", true);
+        iemiNumber.setAttribute("disabled", true);
+      } else {
+        sim1Provider.removeAttribute("disabled");
+        sim1Number.removeAttribute("disabled");
+        sim2Provider.removeAttribute("disabled");
+        sim2Number.removeAttribute("disabled");
+        iemiNumber.removeAttribute("disabled");
+
+        sim1Provider.value = "";
+        sim1Number.value = "";
+        sim2Provider.value = "";
+        sim2Number.value = "";
+        iemiNumber.value = "";
+      }
+    });
+
   // Clear fields if adding
   if (!isViewOnly) {
     document.getElementById("statusForm").reset();
