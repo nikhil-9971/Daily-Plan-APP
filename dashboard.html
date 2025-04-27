@@ -99,202 +99,215 @@
     
 
      <!-- Status Update Modal -->
+     <div id="statusModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-50">
+      <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto">
+        
+        <!-- Title -->
+        <h2 class="text-2xl font-bold text-blue-700 mb-6 text-center border-b pb-2">Update Site Status</h2>
+    
+        <!-- Read-only Fields -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div>
+            <label class="text-sm font-semibold text-gray-700">Engineer Name</label>
+            <input type="text" id="engineerName" class="w-full p-2 mt-1 border rounded bg-gray-100" readonly>
+          </div>
+          <div>
+            <label class="text-sm font-semibold text-gray-700">RO Code</label>
+            <input type="text" id="roCode" class="w-full p-2 mt-1 border rounded bg-gray-100" readonly>
+          </div>
+          <div>
+            <label class="text-sm font-semibold text-gray-700">RO Name</label>
+            <input type="text" id="roName" class="w-full p-2 mt-1 border rounded bg-gray-100" readonly>
+          </div>
+          <div>
+            <label class="text-sm font-semibold text-gray-700">Visit Date</label>
+            <input type="text" id="visitDate" class="w-full p-2 mt-1 border rounded bg-gray-100" readonly>
+          </div>
+        </div>
+    
+        <!-- Fillable Fields -->
+        <h3 class="text-lg font-bold text-red-600 mb-4 underline">Fill All Details Carefully</h3>
+        <form id="statusForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    
+          <!-- First Row -->
+          <div>
+            <label class="text-sm font-semibold">Probe Make</label>
+            <select id="probeMake" required class="w-full p-2 mt-1 border rounded">
+              <option value="">Select</option>
+              <option>SI</option>
+              <option>SBEM</option>
+              <option>Alisonic</option>
+            </select>
+          </div>
+    
+          <div>
+            <label class="text-sm font-semibold">Low Product Lock Set</label>
+            <select id="lowProductLock" required class="w-full p-2 mt-1 border rounded">
+              <option value="">Select</option>
+              <option>350mm/STP</option>
+              <option>150mm/Non STP</option>
+              <option>350mm&150mm /Non STP</option>
+            </select>
+          </div>
+    
+          <div>
+            <label class="text-sm font-semibold">High Water Set at 50mm</label>
+            <select id="highWaterSet" required class="w-full p-2 mt-1 border rounded">
+              <option value="">Select</option>
+              <option>Yes</option>
+              <option>No</option>
+            </select>
+          </div>
+    
+          <div>
+            <label class="text-sm font-semibold">All DU Serial Number Updated</label>
+            <select id="duSerialNumber" required class="w-full p-2 mt-1 border rounded">
+              <option value="">Select</option>
+              <option>Yes</option>
+              <option>No</option>
+            </select>
+          </div>
+    
+          <div>
+            <label class="text-sm font-semibold">Connectivity Type</label>
+            <select id="connectivityType" required class="w-full p-2 mt-1 border rounded">
+              <option value="">Select</option>
+              <option>VSAT</option>
+              <option>Broadband</option>
+              <option>SIM</option>
+              <option>RELCON SIM</option>
+              <option>SDWAN</option>
+            </select>
+          </div>
+    
+          <div>
+            <label class="text-sm font-semibold">SIM-1 Service Provider</label>
+            <select id="sim1Provider" required class="w-full p-2 mt-1 border rounded">
+              <option value="">Select</option>
+              <option>JIO</option>
+              <option>AIRTEL</option>
+              <option>VI</option>
+              <option>NA</option>
+            </select>
+          </div>
+    
+          <div>
+            <label class="text-sm font-semibold">SIM 1 Number</label>
+            <input type="text" id="sim1Number" required class="w-full p-2 mt-1 border rounded">
+          </div>
+    
+          <div>
+            <label class="text-sm font-semibold">SIM-2 Service Provider</label>
+            <select id="sim2Provider" required class="w-full p-2 mt-1 border rounded">
+              <option value="">Select</option>
+              <option>JIO</option>
+              <option>AIRTEL</option>
+              <option>VI</option>
+              <option>NA</option>
+            </select>
+          </div>
+    
+          <div>
+            <label class="text-sm font-semibold">SIM 2 Number</label>
+            <input type="text" id="sim2Number" required class="w-full p-2 mt-1 border rounded">
+          </div>
+    
+          <div>
+            <label class="text-sm font-semibold">IEMI Number</label>
+            <input type="text" id="iemiNumber" required class="w-full p-2 mt-1 border rounded">
+          </div>
+    
+          <div>
+            <label class="text-sm font-semibold">BOS Version with Date</label>
+            <select id="bosVersion" required class="w-full p-2 mt-1 border rounded">
+              <option value="">Select</option>
+              <option>1.0.30(01-Nov-2023)</option>
+              <option>1.0.5(08-Jul-2024)</option>
+            </select>
+          </div>
+    
+          <div>
+            <label class="text-sm font-semibold">FCC Version with Date</label>
+            <select id="fccVersion" required class="w-full p-2 mt-1 border rounded">
+              <option value="">Select</option>
+              <option>1.0.30(01-Nov-2023)</option>
+              <option>1.0.5(08-Jul-2024)</option>
+            </select>
+          </div>
+    
+          <div class="md:col-span-2">
+            <label class="text-sm font-semibold">Wireless Slave Version</label>
+            <textarea id="wirelessSlave" required placeholder="Example: 1-02.00.60, 2-03.00.70" class="w-full p-2 mt-1 border rounded"></textarea>
+          </div>
+    
+          <div>
+            <label class="text-sm font-semibold">SFTP Config</label>
+            <select id="sftpConfig" required class="w-full p-2 mt-1 border rounded">
+              <option value="">Select</option>
+              <option>Yes</option>
+              <option>No</option>
+            </select>
+          </div>
+    
+          <div>
+            <label class="text-sm font-semibold">Admin Password Updated</label>
+            <select id="adminPassword" required class="w-full p-2 mt-1 border rounded">
+              <option value="">Select</option>
+              <option>Yes</option>
+              <option>No</option>
+            </select>
+          </div>
+    
+          <div>
+            <label class="text-sm font-semibold">Work Completion Status</label>
+            <select id="workCompletion" required class="w-full p-2 mt-1 border rounded">
+              <option value="">Select</option>
+              <option>Partial</option>
+              <option>All</option>
+            </select>
+          </div>
+    
+          <div class="md:col-span-2">
+            <label class="text-sm font-semibold">Earthing Status</label>
+            <textarea id="earthingStatus" required placeholder="Example: Earthing OK, PN=234V, PE=233V, NE=1V" class="w-full p-2 mt-1 border rounded"></textarea>
+          </div>
+    
+          <!-- DU Offline Section -->
+          <div>
+            <label class="text-sm font-semibold">No of DU Offline</label>
+            <select id="duOffline" required class="w-full p-2 mt-1 border rounded">
+              <option value="">Select</option>
+              <option>ALL OK</option>
+              <option>1</option>
+              <option>2</option>
+              <option>3</option>
+              <option>4</option>
+              <option>ALL DU ISSUE</option>
+            </select>
+          </div>
+    
+          <div>
+            <label class="text-sm font-semibold">Reason for DU Offline</label>
+            <textarea id="duRemark" required placeholder="Example: DU-01 POS Card Issue" class="w-full p-2 mt-1 border rounded"></textarea>
+          </div>
+    
 
-     <div id="statusModal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
-      <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-          <h2 class="text-xl font-semibold mb-4">Update Site Status</h2>
+         
 
-     <div class="grid grid-cols-2 gap-4">    <!-- Read-Only Fields -->
-      <div class="mb-2">
-         <label class="block font-medium">Engineer Name:</label>
-         <input type="text" id="engineerName" class="w-full p-2 border rounded bg-gray-100" readonly>
+        </form>
+    
+        <!-- Buttons -->
+        <div class="flex justify-end mt-6 space-x-4">
+          <button type="button" class="px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded" onclick="closeStatusModal()">Cancel</button>
+          <button type="submit" form="statusForm" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded" id="saveBtn">Save</button>
+        </div>
+
+    
       </div>
-
-      <div class="mb-2">
-         <label class="block font-medium">RO Code:</label>
-         <input type="text" id="roCode" class="w-full p-2 border rounded bg-gray-100" readonly>
-      </div>
-
-      <div class="mb-2">
-        <label class="block font-medium">RO Name:</label>
-        <input type="text" id="roName" class="w-full p-2 border rounded bg-gray-100" readonly>
-      </div>
-
-    <div class="mb-2">
-        <label class="block font-medium">Visit Date:</label>
-        <input type="text" id="visitDate" class="w-full p-2 border rounded bg-gray-100" readonly>
     </div>
-  </div>
-
-
-  <h2 class="text-lg font-semibold mb-4 underline text-red-600">Fill all details</h2>
-          <form id="statusForm" class="grid grid-cols-2 gap-4">
-              <div>
-                  <label class="block font-medium">Probe Make</label>
-                  <select class="w-full p-2 border rounded" id="probeMake" required>
-                    <option>SI</option>
-                    <option>SBEM</option>
-                    <option>Alisonic</option>
-                  </select>
-              </div>
-              <div>
-                  <label class="block font-medium">Low Product Lock Set</label>
-                  <select class="w-full p-2 border rounded" id="lowProductLock" required>
-                    <option>350mm/STP</option>
-                    <option>150mm/Non STP</option>
-                    <option>350mm&150mm /Non STP</option>
-                  </select>
-              </div>
-              <div>
-                  <label class="block font-medium">High Water Set at 50mm</label>
-                  <select class="w-full p-2 border rounded" id="highWaterSet">
-                    <option>Yes</option>
-                    <option>No</option>
-                  </select>
-
-              </div>
-              <div>
-                  <label class="block font-medium">All DU Serial Number Updated</label>
-                  <select class="w-full p-2 border rounded" id="duSerialNumber" required>
-                    <option>Yes</option>
-                    <option>No</option>
-                </select>
-              </div>
-              <div>
-                  <label class="block font-medium">Connectivity Type</label>
-                  <select class="w-full p-2 border rounded" id="connectivityType" required>
-                      <option>VSAT</option>
-                      <option>Broadband</option>
-                      <option>SIM</option>
-                      <option>RELCON SIM</option>
-                      <option>SDWAN</option>
-                  </select>
-              </div>
-              <div>
-                  <label class="block font-medium">SIM-1 Service Provider</label>
-                  <select class="w-full p-2 border rounded" id="sim1Provider" required>
-                      <option>NA</option>
-                      <option>JIO</option>
-                      <option>AIRTEL</option>
-                      <option>VI</option>
-                      
-                  </select>
-              </div>
-              <div>
-                  <label class="block font-medium">SIM 1 Number</label>
-                  <input type="text" class="w-full p-2 border rounded" id="sim1Number" required>
-              </div>
-              <div>
-                  <label class="block font-medium">SIM-2 Service Provider</label>
-                  <select class="w-full p-2 border rounded" id="sim2Provider" required>
-                      <option>NA</option>
-                      <option>JIO</option>
-                      <option>AIRTEL</option>
-                      <option>VI</option>
-                      
-                  </select>
-              </div>
-              <div>
-                  <label class="block font-medium">SIM 2 Number</label>
-                  <input type="text" class="w-full p-2 border rounded" id="sim2Number" required>
-              </div>
-              <div>
-                  <label class="block font-medium">IEMI Number</label>
-                  <input type="text" class="w-full p-2 border rounded" id="iemiNumber" required>
-              </div>
-              <div>
-                  <label class="block font-medium">BOS Version with Date</label>
-                  <select class="w-full p-2 border rounded" id="bosVersion" required>
-                    <option>1.0.30(01-Nov-2023)</option>
-                    <option>1.0.5(08-Jul-2024)</option>
-                </select>
-                  
-              </div>
-              <div>
-                  <label class="block font-medium">FCC Version with Date</label>
-                  <select class="w-full p-2 border rounded" id="fccVersion" required>
-                    <option>1.0.30(01-Nov-2023)</option>
-                    <option>1.0.5(08-Jul-2024)</option>
-                </select>
-              </div>
-              <div class="col-span-2">
-                  <label class="block font-medium">Wireless Slave Version</label>
-                  <textarea class="w-full p-2 border rounded" id="wirelessSlave" required placeholder="Example: 1- 02.00.60, 2-03.00.70"></textarea>
-              </div>
-              <div>
-                  <label class="block font-medium">SFTP Config</label>
-                  <select class="w-full p-2 border rounded" id="sftpConfig" required>
-                      <option>Yes</option>
-                      <option>No</option>
-                  </select>
-              </div>
-              <div>
-                  <label class="block font-medium">Admin Password Updated</label>
-                  <select class="w-full p-2 border rounded" id="adminPassword" required>
-                      <option>Yes</option>
-                      <option>No</option>
-                  </select>
-              </div>
-
-              <div>
-                <label class="block font-medium">Work Completion Status</label>
-                <select class="w-full p-2 border rounded" id="workCompletion" required>
-                    <option>Partial</option>
-                    <option>All</option>
-                </select>
-            </div>
-
-              <div class="col-span-2">
-                  <label class="block font-medium">Earthing Status</label>
-                  <textarea class="w-full p-2 border rounded" id="earthingStatus" required placeholder="Example: Earthing is Ok/Not PN = 234V, PE = 233V, NE = 1V"></textarea></textarea>
-              </div>
-
-
-            <div class="flex items-start gap-4 mt-2">
-              <!-- No of DU Offline -->
-              <div class="w-36">
-                <label class="block font-medium mb-1">No of DU Offline</label>
-                <select class="w-full p-2 border rounded" id="duOffline" required>
-                  <option>ALL OK</option>
-                  <option>1</option>
-                  <option>2</option>
-                  <option>3</option>
-                  <option>4</option>
-                  <option>ALL DU ISSUE</option>
-                </select>
-              </div>
-            
-              <!-- Reason for DU Offline -->
-              <div class="flex-1">
-                <label class="block font-medium mb-1">Reason for DU offline</label>
-                <textarea
-                  class="w-full p-2 border rounded"
-                  id="duRemark"
-                  required
-                  placeholder="Remark: DU-01 - DU POS Card Issue"
-                  rows="3"
-                ></textarea>
-              </div>
-            </div>
-            
-
- 
-            
-
-
-              <div class="col-span-2 flex justify-end space-x-2 mt-4">
-                  <button type="button" class="px-4 py-2 bg-gray-500 text-white rounded" onclick="closeStatusModal()">Cancel</button>
-                  <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded" id="saveBtn">Save</button>
-              </div>
-          </form>
-
-      
-
-
-      </div>
-  </div>
-  
+    
+           
     <script src="./statusmodel.js"></script>
-    <script src="./dashboard.js"></script>
+    <script src="./dashboarda.js"></script>
   </body>
 </html>
