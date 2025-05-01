@@ -75,6 +75,24 @@ function openModal(rowData, isViewOnly = false) {
   document.getElementById("saveBtn").style.display = isViewOnly
     ? "none"
     : "inline-block";
+
+  // 🛰️ Fetch and set current location
+  const locationField = document.getElementById("locationField");
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude.toFixed(6);
+        const lng = position.coords.longitude.toFixed(6);
+        locationField.value = `${lat}, ${lng}`;
+      },
+      (err) => {
+        console.warn("Location access denied or error:", err.message);
+        locationField.value = "Unable to fetch location";
+      }
+    );
+  } else {
+    locationField.value = "Geolocation not supported";
+  }
 }
 
 function closeStatusModal() {
@@ -114,10 +132,11 @@ document
       earthingStatus: document.getElementById("earthingStatus").value,
       duOffline: document.getElementById("duOffline").value,
       duRemark: document.getElementById("duRemark").value,
+      location: document.getElementById("locationField").value,
     };
 
     fetch(
-      "https://script.google.com/macros/s/AKfycbymE1Hjtj0prXw0HkuvWpSdriDDwoECVv01VhzSq5dqjvIXOZajYMnxCUBGstPgCZx7kA/exec?action=saveUpdateStatus",
+      "https://script.google.com/macros/s/AKfycbxk3OWvmuJphVxYRRVxFx67bwlaCFRG10Y9ZgIVaLOTjhdtCgMm8wSwDSl1oBABbCPeng/exec?action=saveUpdateStatus",
       {
         method: "POST",
         mode: "no-cors",
