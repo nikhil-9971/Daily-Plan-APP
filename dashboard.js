@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
 async function loadEngineers() {
   try {
     let response = await fetch(
-      "https://script.google.com/macros/s/AKfycbymE1Hjtj0prXw0HkuvWpSdriDDwoECVv01VhzSq5dqjvIXOZajYMnxCUBGstPgCZx7kA/exec?action=fetchEngineers"
+      "https://script.google.com/macros/s/AKfycbxk3OWvmuJphVxYRRVxFx67bwlaCFRG10Y9ZgIVaLOTjhdtCgMm8wSwDSl1oBABbCPeng/exec?action=fetchEngineers"
     );
     let data = await response.json();
     let engineerFilter = document.getElementById("engineerFilter");
@@ -80,7 +80,7 @@ function login() {
   loginButton.innerHTML = '<span class="spinner"></span> Logging in...';
   loginButton.disabled = true;
 
-  let apiUrl = `https://script.google.com/macros/s/AKfycbymE1Hjtj0prXw0HkuvWpSdriDDwoECVv01VhzSq5dqjvIXOZajYMnxCUBGstPgCZx7kA/exec?action=login&username=${username}&password=${password}`;
+  let apiUrl = `https://script.google.com/macros/s/AKfycbxk3OWvmuJphVxYRRVxFx67bwlaCFRG10Y9ZgIVaLOTjhdtCgMm8wSwDSl1oBABbCPeng/exec?action=login&username=${username}&password=${password}`;
 
   fetch(apiUrl)
     .then((response) => response.json())
@@ -132,7 +132,7 @@ function fetchVisitData() {
   fetchbutton.innerHTML = `<span class="spinner"></span> Fetching Visit Data...`;
   fetchbutton.disabled = true;
 
-  let apiUrl = `https://script.google.com/macros/s/AKfycbymE1Hjtj0prXw0HkuvWpSdriDDwoECVv01VhzSq5dqjvIXOZajYMnxCUBGstPgCZx7kA/exec?action=fetchVisitData&from=${encodeURIComponent(
+  let apiUrl = `https://script.google.com/macros/s/AKfycbxk3OWvmuJphVxYRRVxFx67bwlaCFRG10Y9ZgIVaLOTjhdtCgMm8wSwDSl1oBABbCPeng/exec?action=fetchVisitData&from=${encodeURIComponent(
     fromDate
   )}&to=${encodeURIComponent(toDate)}&user=${user}`;
 
@@ -228,7 +228,7 @@ function formatDate(isoDate) {
 }
 
 async function fetchStatusData(roCode, visitDate) {
-  const apiUrl = `https://script.google.com/macros/s/AKfycbymE1Hjtj0prXw0HkuvWpSdriDDwoECVv01VhzSq5dqjvIXOZajYMnxCUBGstPgCZx7kA/exec?action=getStatus&roCode=${encodeURIComponent(
+  const apiUrl = `https://script.google.com/macros/s/AKfycbxk3OWvmuJphVxYRRVxFx67bwlaCFRG10Y9ZgIVaLOTjhdtCgMm8wSwDSl1oBABbCPeng/exec?action=getStatus&roCode=${encodeURIComponent(
     roCode
   )}&visitDate=${encodeURIComponent(visitDate)}`;
 
@@ -273,6 +273,7 @@ async function generatePDF(roCode, visitDate) {
       earthingStatus: "Earthing Status",
       duOffline: "No of DU offline",
       duRemark: "Reason for DU offline",
+      location: "Site Location",
     };
 
     // HTML content with custom styles
