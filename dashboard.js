@@ -2,21 +2,25 @@ document.addEventListener("DOMContentLoaded", function () {
   let user = localStorage.getItem("loggedInUser");
   let role = localStorage.getItem("userRole");
   let dashboardContainer = document.getElementById("dashboardContainer");
+  let sideBar = document.getElementById("sideBar");
+
   let welcomeMessage = document.getElementById("welcomeMessage");
   let loginModal = document.getElementById("loginModal");
 
   if (user && dashboardContainer && welcomeMessage) {
-    dashboardContainer.style.display = "block";
+    dashboardContainer.classList.remove("hidden");
     welcomeMessage.innerText = `Welcome: ${user} (${role})`;
-
     if (role === "Admin") {
       loadEngineers();
+    }
+    if (role === "Engineer") {
+      updateEngineerAnalytics(user); // ✅ Added here
     }
   } else if (loginModal) {
     loginModal.classList.remove("hidden");
   } else {
     console.error(
-      "❌ Element Not Found: Check 'dashboardContainer' or 'loginModal' in HTML."
+      "❌ Element Not Found: Check 'visitContainer' or 'loginModal' in HTML."
     );
   }
 });
@@ -25,7 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
 async function loadEngineers() {
   try {
     let response = await fetch(
-      "https://script.google.com/macros/s/AKfycbxk3OWvmuJphVxYRRVxFx67bwlaCFRG10Y9ZgIVaLOTjhdtCgMm8wSwDSl1oBABbCPeng/exec?action=fetchEngineers"
+      "https://script.google.com/macros/s/AKfycbyjyoAGc0OxKldWB4Zcj9pJxgaZQRoMbLpMjkhOZbvqWzJC-M_LrdPz44iJZTfeb0kKpw/exec?action=fetchEngineers"
     );
     let data = await response.json();
     let engineerFilter = document.getElementById("engineerFilter");
@@ -80,7 +84,7 @@ function login() {
   loginButton.innerHTML = '<span class="spinner"></span> Logging in...';
   loginButton.disabled = true;
 
-  let apiUrl = `https://script.google.com/macros/s/AKfycbxk3OWvmuJphVxYRRVxFx67bwlaCFRG10Y9ZgIVaLOTjhdtCgMm8wSwDSl1oBABbCPeng/exec?action=login&username=${username}&password=${password}`;
+  let apiUrl = `https://script.google.com/macros/s/AKfycbyjyoAGc0OxKldWB4Zcj9pJxgaZQRoMbLpMjkhOZbvqWzJC-M_LrdPz44iJZTfeb0kKpw/exec?action=login&username=${username}&password=${password}`;
 
   fetch(apiUrl)
     .then((response) => response.json())
@@ -110,6 +114,22 @@ function logout() {
   localStorage.removeItem("loggedInUser"); // ✅ Remove user session
   window.location.href = "login.html"; // ✅ Redirect to Login
 }
+
+// 🔹 Show/Hide Sections
+function showSection(sectionId) {
+  const sections = ["dashboardContainer", "visitContainer", "statusModal"];
+  sections.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add("hidden");
+  });
+  const target = document.getElementById(sectionId);
+  if (target) target.classList.remove("hidden");
+}
+
+function hideVisitContainer() {
+  const container = document.getElementById("visitContainer");
+  if (container) container.classList.add("hidden");
+}
 // 🔹 **Fetch Visit Data with Role-based Access**
 function fetchVisitData() {
   let fromDate = document.getElementById("fromDate").value;
@@ -132,7 +152,7 @@ function fetchVisitData() {
   fetchbutton.innerHTML = `<span class="spinner"></span> Fetching Visit Data...`;
   fetchbutton.disabled = true;
 
-  let apiUrl = `https://script.google.com/macros/s/AKfycbxk3OWvmuJphVxYRRVxFx67bwlaCFRG10Y9ZgIVaLOTjhdtCgMm8wSwDSl1oBABbCPeng/exec?action=fetchVisitData&from=${encodeURIComponent(
+  let apiUrl = `https://script.google.com/macros/s/AKfycbyjyoAGc0OxKldWB4Zcj9pJxgaZQRoMbLpMjkhOZbvqWzJC-M_LrdPz44iJZTfeb0kKpw/exec?action=fetchVisitData&from=${encodeURIComponent(
     fromDate
   )}&to=${encodeURIComponent(toDate)}&user=${user}`;
 
@@ -228,7 +248,7 @@ function formatDate(isoDate) {
 }
 
 async function fetchStatusData(roCode, visitDate) {
-  const apiUrl = `https://script.google.com/macros/s/AKfycbxk3OWvmuJphVxYRRVxFx67bwlaCFRG10Y9ZgIVaLOTjhdtCgMm8wSwDSl1oBABbCPeng/exec?action=getStatus&roCode=${encodeURIComponent(
+  const apiUrl = `https://script.google.com/macros/s/AKfycbyjyoAGc0OxKldWB4Zcj9pJxgaZQRoMbLpMjkhOZbvqWzJC-M_LrdPz44iJZTfeb0kKpw/exec?action=getStatus&roCode=${encodeURIComponent(
     roCode
   )}&visitDate=${encodeURIComponent(visitDate)}`;
 
@@ -355,4 +375,99 @@ async function generatePDF(roCode, visitDate) {
     console.error("PDF Generation Error:", error);
     Swal.fire("Error", "Failed to generate PDF.", "error");
   }
+}
+
+function hideVisitContainer() {
+  const container = document.getElementById("visitContainer");
+  if (container) {
+    container.classList.add("hidden");
+  }
+}
+
+const locationField1 = document.getElementById("locationField1");
+
+if (navigator.geolocation && locationField1) {
+  navigator.geolocation.getCurrentPosition(
+    async (position) => {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+
+      let locationName = "Unknown";
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+        );
+        const data = await response.json();
+        const addr = data.address;
+
+        locationName =
+          addr.village ||
+          addr.town ||
+          addr.suburb ||
+          addr.locality ||
+          addr.hamlet ||
+          addr.county ||
+          addr.state_district ||
+          addr.state ||
+          "Unknown";
+      } catch (error) {
+        console.error("Error fetching location name:", error);
+      }
+
+      // locationField1.textContent = `Current Location: ${locationName} Lat/Long: ${lat.toFixed(
+      //   4
+      // )}, ${lng.toFixed(4)}`;
+      locationField1.innerHTML = `Current Location: ${locationName}<br>Lat/Long: ${lat.toFixed(
+        4
+      )}, ${lng.toFixed(4)}`;
+    },
+    (error) => {
+      console.warn("Location access denied or error:", error.message);
+      locationField1.textContent = "Unable to fetch location";
+    }
+  );
+}
+
+function updateEngineerAnalytics(user) {
+  const fromDate = "2025-04-22"; // Optional: filter logic ke liye
+  const toDate = "2025-12-31"; // Optional
+
+  fetch(
+    `https://script.google.com/macros/s/AKfycbyjyoAGc0OxKldWB4Zcj9pJxgaZQRoMbLpMjkhOZbvqWzJC-M_LrdPz44iJZTfeb0kKpw/exec?action=fetchVisitData&user=${encodeURIComponent(
+      user
+    )}&from=${fromDate}&to=${toDate}`
+  )
+    .then((res) => res.json())
+    .then((visitData) => {
+      if (!visitData || visitData.length === 0) return;
+
+      const validVisits = visitData.filter((v) => v.roCode !== "N/A");
+      const totalVisits = validVisits.length;
+
+      // Get the latest valid visit date
+      const lastVisitDate = validVisits.length
+        ? validVisits.map((v) => new Date(v.date)).sort((a, b) => b - a)[0]
+        : null;
+
+      fetch(
+        `https://script.google.com/macros/s/AKfycbyjyoAGc0OxKldWB4Zcj9pJxgaZQRoMbLpMjkhOZbvqWzJC-M_LrdPz44iJZTfeb0kKpw/exec?action=getStatus&user=${encodeURIComponent(
+          user
+        )}`
+      )
+        .then((res) => res.json())
+        .then((statusData) => {
+          // const completed = statusData.length;
+          const completed = Array.isArray(statusData) ? statusData.length : 0;
+          const pending = totalVisits - completed;
+
+          console.log("Status Data:", statusData);
+
+          document.getElementById("totalVisits").textContent = totalVisits;
+          document.getElementById("completed").textContent = completed;
+          document.getElementById("pending").textContent = pending;
+          document.getElementById("lastVisit").textContent = lastVisitDate
+            ? formatDate(lastVisitDate)
+            : "--";
+        });
+    });
 }
