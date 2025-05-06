@@ -136,7 +136,7 @@ document
     };
 
     fetch(
-      "https://script.google.com/macros/s/AKfycbxk3OWvmuJphVxYRRVxFx67bwlaCFRG10Y9ZgIVaLOTjhdtCgMm8wSwDSl1oBABbCPeng/exec?action=saveUpdateStatus",
+      "https://script.google.com/macros/s/AKfycbyjyoAGc0OxKldWB4Zcj9pJxgaZQRoMbLpMjkhOZbvqWzJC-M_LrdPz44iJZTfeb0kKpw/exec?action=saveUpdateStatus",
       {
         method: "POST",
         mode: "no-cors",
