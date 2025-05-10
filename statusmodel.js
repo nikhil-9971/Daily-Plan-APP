@@ -105,6 +105,20 @@ document
   .addEventListener("submit", function (event) {
     event.preventDefault();
 
+    const location = document.getElementById("locationField").value;
+    if (
+      !location ||
+      location.includes("Unable") ||
+      location.includes("not supported")
+    ) {
+      Swal.fire(
+        "Location Required",
+        "Please allow location access and wait for it to be fetched before submitting.",
+        "warning"
+      );
+      return;
+    }
+
     saveBtn.disabled = true;
     saveBtn.innerText = "Saving... ⏳";
 
