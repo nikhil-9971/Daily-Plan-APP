@@ -12,6 +12,11 @@ document.addEventListener("DOMContentLoaded", function () {
     welcomeMessage.innerText = `Welcome: ${user} (${role})`;
     if (role === "Admin") {
       loadEngineers();
+      // Hide engineer-only cards
+      const cards = document.getElementById("engineerAnalyticsCards");
+      if (cards) cards.style.display = "none";
+      renderAdminAnalytics(user);
+      // ✅ NEW: Load analytics table for admin
     }
     if (role === "Engineer") {
       updateEngineerAnalytics(user); // ✅ Added here
@@ -470,4 +475,125 @@ function updateEngineerAnalytics(user) {
             : "--";
         });
     });
+}
+
+// Admin Anlytics view
+
+function renderAdminAnalytics(user) {
+  const fromDate = "2025-04-22";
+  const toDate = "2025-12-31";
+
+  fetch(
+    `https://script.google.com/macros/s/AKfycbyjyoAGc0OxKldWB4Zcj9pJxgaZQRoMbLpMjkhOZbvqWzJC-M_LrdPz44iJZTfeb0kKpw/exec?action=fetchVisitData&user=${encodeURIComponent(
+      user
+    )}&from=${fromDate}&to=${toDate}`
+  )
+    .then((res) => res.json())
+    .then((visitData) => {
+      const validVisits = visitData.filter((v) => v.roCode !== "N/A");
+      const analytics = {};
+
+      validVisits.forEach((v) => {
+        const eng = v.engineer;
+        if (!analytics[eng]) {
+          analytics[eng] = { total: 0, completed: 0, lastVisit: null };
+        }
+        analytics[eng].total += 1;
+        if (v.statusAvailable) analytics[eng].completed += 1;
+
+        const visitDate = new Date(v.date);
+        if (
+          !analytics[eng].lastVisit ||
+          visitDate > new Date(analytics[eng].lastVisit)
+        ) {
+          analytics[eng].lastVisit = visitDate.toISOString().split("T")[0];
+        }
+      });
+
+      const sortedEngineers = Object.keys(analytics).sort();
+      const container = document.getElementById("adminAnalyticsContainer");
+
+      // HTML for dropdown + apply button
+      container.innerHTML = `
+        <div class="relative inline-block mb-3" style="min-width: 240px;">
+          <button id="dropdownToggle" class="w-full text-left border px-3 py-2 rounded bg-white shadow" >
+            Select Engineer
+          </button>
+          <div id="checkboxDropdown" class="absolute z-10 mt-1 hidden border bg-white shadow rounded w-full max-h-60 overflow-y-auto">
+            ${sortedEngineers
+              .map(
+                (name) => `
+              <label class="block px-3 py-1 hover:bg-gray-100">
+                <input type="checkbox" class="engineerCheckbox mr-2" value="${name}" />
+                ${name}
+              </label>
+            `
+              )
+              .join("")}
+          </div>
+        </div>
+        <button id="applyFilter" class="ml-2 px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Apply</button>
+
+        <div class="overflow-x-auto mt-4">
+          <table class="min-w-full text-sm border border-gray-300 rounded shadow-md">
+            <thead class="bg-blue-600 text-white">
+              <tr>
+                <th class="px-4 py-2 border">Engineer</th>
+                <th class="px-4 py-2 border">Total Visits</th>
+                <th class="px-4 py-2 border ">Status Updated</th>
+                <th class="px-4 py-2 border ">Status Pending</th>
+                <th class="px-4 py-2 border ">Last Visit</th>
+              </tr>
+            </thead>
+            <tbody id="engineerTableBody" class="bg-white">
+              ${sortedEngineers
+                .map((name) => renderTableRow(name, analytics[name]))
+                .join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+
+      // Dropdown toggle
+      document
+        .getElementById("dropdownToggle")
+        .addEventListener("click", () => {
+          const dd = document.getElementById("checkboxDropdown");
+          dd.classList.toggle("hidden");
+        });
+
+      // Apply filter logic
+      document.getElementById("applyFilter").addEventListener("click", () => {
+        const selected = Array.from(
+          document.querySelectorAll(".engineerCheckbox:checked")
+        ).map((cb) => cb.value);
+        const tbody = document.getElementById("engineerTableBody");
+
+        const filtered =
+          selected.length === 0
+            ? sortedEngineers
+            : sortedEngineers.filter((name) => selected.includes(name));
+
+        tbody.innerHTML = filtered
+          .map((name) => renderTableRow(name, analytics[name]))
+          .join("");
+
+        // Optional: close dropdown on apply
+        document.getElementById("checkboxDropdown").classList.add("hidden");
+      });
+    });
+}
+
+function renderTableRow(name, stat) {
+  return `
+    <tr class="hover:bg-gray-100">
+      <td class="px-4 py-2 border font-medium">${name}</td>
+      <td class="px-4 py-2 border text-center">${stat.total}</td>
+      <td class="px-4 py-2 border text-center">${stat.completed}</td>
+      <td class="px-4 py-2 border text-center">${
+        stat.total - stat.completed
+      }</td>
+      <td class="px-4 py-2 border text-center">${stat.lastVisit || "--"}</td>
+    </tr>
+  `;
 }
