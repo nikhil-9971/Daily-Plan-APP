@@ -15,13 +15,13 @@ document.addEventListener("DOMContentLoaded", function () {
   dateOfVisit.value = today;
 
   roCode.addEventListener("input", function () {
-    if (roCode.value.trim().length >= 3) {
+    if (roCode.value.length === 8) {
       fetch(
         `https://script.google.com/macros/s/AKfycbyjyoAGc0OxKldWB4Zcj9pJxgaZQRoMbLpMjkhOZbvqWzJC-M_LrdPz44iJZTfeb0kKpw/exec?action=getRODetails&roCode=${roCode.value}`
       )
         .then((response) => response.json())
         .then((data) => {
-          // console.log("API Response:", data);
+          console.log("API Response:", data);
           if (data) {
             region.value = data.region || "Not Found";
             region.setAttribute("readonly", true);
@@ -71,16 +71,16 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // phase.addEventListener("change", function () {
-  //   if (["NPL", "JIO BP", "IN LEAVE", "HPCL OFFICE"].includes(phase.value)) {
-  //     convertRegionToDropdown();
-  //     // region.removeAttribute("readonly");
-  //     roName.removeAttribute("readonly");
-  //     roCode.removeAttribute("maxlength");
-  //   } else {
-  //     roCode.setAttribute("maxlength", "8");
-  //   }
-  // });
+  phase.addEventListener("change", function () {
+    if (["NPL", "JIO BP", "IN LEAVE", "HPCL OFFICE"].includes(phase.value)) {
+      convertRegionToDropdown();
+      // region.removeAttribute("readonly");
+      roName.removeAttribute("readonly");
+      roCode.removeAttribute("maxlength");
+    } else {
+      roCode.setAttribute("maxlength", "8");
+    }
+  });
 
   function convertRegionToDropdown() {
     let select = document.createElement("select");
