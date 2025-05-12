@@ -446,7 +446,18 @@ function updateEngineerAnalytics(user) {
     .then((visitData) => {
       if (!visitData || visitData.length === 0) return;
 
-      const validVisits = visitData.filter((v) => v.roCode !== "N/A");
+      // const validVisits = visitData.filter((v) => v.roCode !== "N/A");
+      const excludedPhases = [
+        "NO PLAN",
+        "RBML",
+        "JIO BP",
+        "BPCL",
+        "HPCL OFFICE",
+        "IN LEAVE",
+      ];
+      const validVisits = visitData.filter(
+        (v) => !excludedPhases.includes(v.phase)
+      );
       const totalVisits = validVisits.length;
 
       // Get the latest valid visit date
@@ -479,6 +490,214 @@ function updateEngineerAnalytics(user) {
 
 // Admin Anlytics view
 
+// function renderAdminAnalytics(user) {
+//   const fromDate = "2025-04-22";
+//   const toDate = "2025-12-31";
+
+//   fetch(
+//     `https://script.google.com/macros/s/AKfycbyjyoAGc0OxKldWB4Zcj9pJxgaZQRoMbLpMjkhOZbvqWzJC-M_LrdPz44iJZTfeb0kKpw/exec?action=fetchVisitData&user=${encodeURIComponent(
+//       user
+//     )}&from=${fromDate}&to=${toDate}`
+//   )
+//     .then((res) => res.json())
+//     .then((visitData) => {
+//       const validVisits = visitData.filter((v) => v.roCode !== "N/A");
+//       const analytics = {};
+//       const engineerRows = {};
+
+//       validVisits.forEach((v) => {
+//         const eng = v.engineer;
+//         if (!analytics[eng]) {
+//           analytics[eng] = { total: 0, completed: 0, lastVisit: null };
+//           engineerRows[eng] = [];
+//         }
+//         analytics[eng].total += 1;
+//         if (v.statusAvailable) analytics[eng].completed += 1;
+
+//         const visitDate = new Date(v.date);
+//         if (
+//           !analytics[eng].lastVisit ||
+//           visitDate > new Date(analytics[eng].lastVisit)
+//         ) {
+//           analytics[eng].lastVisit = visitDate.toISOString().split("T")[0];
+//         }
+
+//         engineerRows[eng].push({
+//           ...v,
+//           status: v.statusAvailable ? "Completed" : "Pending",
+//         });
+//       });
+
+//       const sortedEngineers = Object.keys(analytics).sort();
+//       const container = document.getElementById("adminAnalyticsContainer");
+
+//       // Render UI
+//       container.innerHTML = `
+//         <div class="relative inline-block mb-3 w-[260px]">
+//           <button id="dropdownToggle" class="w-full text-left border px-3 py-2 rounded bg-white shadow">
+//             Select Engineers ▼
+//           </button>
+//           <div id="checkboxDropdown" class="absolute z-10 mt-1 hidden border bg-white shadow rounded w-full max-h-60 overflow-y-auto">
+//             <label class="block px-3 py-1 hover:bg-gray-100 font-semibold">
+//               <input type="checkbox" id="selectAllEngineers" class="mr-2" />
+//               All Engineers
+//             </label>
+//             ${sortedEngineers
+//               .map(
+//                 (name) => `
+//               <label class="block px-3 py-1 hover:bg-gray-100">
+//                 <input type="checkbox" class="engineerCheckbox mr-2" value="${name}" />
+//                 ${name}
+//               </label>
+//             `
+//               )
+//               .join("")}
+//           </div>
+//         </div>
+//         <button id="applyFilter" class="ml-2 px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Apply</button>
+
+//         <div class="overflow-x-auto mt-4">
+//           <table class="min-w-full text-sm border border-gray-300 rounded shadow-md">
+//             <thead class="bg-blue-600 text-white">
+//               <tr>
+//                 <th class="px-4 py-2 border">Engineer</th>
+//                 <th class="px-4 py-2 border cursor-pointer" id="exportVisits">Total Visits</th>
+//                 <th class="px-4 py-2 border cursor-pointer" id="exportCompleted">Status Updated</th>
+//                 <th class="px-4 py-2 border">Status Pending</th>
+//                 <th class="px-4 py-2 border">Last Visit</th>
+//               </tr>
+//             </thead>
+//             <tbody id="engineerTableBody" class="bg-white">
+//               ${sortedEngineers
+//                 .map((name) => renderTableRow(name, analytics[name]))
+//                 .join("")}
+//             </tbody>
+//           </table>
+//         </div>
+//       `;
+
+//       // Dropdown toggle
+//       document
+//         .getElementById("dropdownToggle")
+//         .addEventListener("click", () => {
+//           document
+//             .getElementById("checkboxDropdown")
+//             .classList.toggle("hidden");
+//         });
+
+//       // Select All logic
+//       const allCheckbox = document.getElementById("selectAllEngineers");
+//       allCheckbox.addEventListener("change", function () {
+//         document.querySelectorAll(".engineerCheckbox").forEach((cb) => {
+//           cb.checked = this.checked;
+//         });
+//       });
+
+//       // Apply filter
+//       document.getElementById("applyFilter").addEventListener("click", () => {
+//         const selected = Array.from(
+//           document.querySelectorAll(".engineerCheckbox:checked")
+//         ).map((cb) => cb.value);
+//         const tbody = document.getElementById("engineerTableBody");
+
+//         const filtered =
+//           selected.length === 0
+//             ? sortedEngineers
+//             : sortedEngineers.filter((name) => selected.includes(name));
+//         tbody.innerHTML = filtered
+//           .map((name) => renderTableRow(name, analytics[name]))
+//           .join("");
+
+//         document.getElementById("checkboxDropdown").classList.add("hidden");
+//       });
+
+//       // Export: Total Visits
+//       document.getElementById("exportVisits").addEventListener("click", () => {
+//         const selected = getSelectedEngineers() || sortedEngineers;
+//         const rows = selected.flatMap((eng) => engineerRows[eng] || []);
+//         exportToExcel(rows, "Total_Visits");
+//       });
+
+//       // Export: Status Updated
+//       document
+//         .getElementById("exportCompleted")
+//         .addEventListener("click", () => {
+//           const selected = getSelectedEngineers() || sortedEngineers;
+//           const completedRows = selected.flatMap((eng) =>
+//             (engineerRows[eng] || []).filter((r) => r.status === "Completed")
+//           );
+//           exportToExcel(completedRows, "Status_Updated");
+//         });
+
+//       function getSelectedEngineers() {
+//         const checked = Array.from(
+//           document.querySelectorAll(".engineerCheckbox:checked")
+//         ).map((cb) => cb.value);
+//         return checked.length > 0 ? checked : null;
+//       }
+
+//       function exportToExcel(rows, filenamePrefix) {
+//         if (rows.length === 0) {
+//           alert("No data to export!");
+//           return;
+//         }
+
+//         const headers = [
+//           "Engineer",
+//           "RO Code",
+//           "RO Name",
+//           "Purpose",
+//           "Issue Type",
+//           "AMC Qtr",
+//           "Date",
+//           "Status",
+//         ];
+//         const csv = [
+//           headers.join(","),
+//           ...rows.map((r) =>
+//             [
+//               r.engineer,
+//               r.roCode,
+//               r.roName,
+//               r.purpose,
+//               r.issueType,
+//               r.amcQtr,
+//               r.date,
+//               r.status,
+//             ]
+//               .map((v) => `"${v}"`)
+//               .join(",")
+//           ),
+//         ].join("\n");
+
+//         const blob = new Blob([csv], { type: "text/csv" });
+//         const url = URL.createObjectURL(blob);
+
+//         const a = document.createElement("a");
+//         a.href = url;
+//         a.download = `${filenamePrefix}_${
+//           new Date().toISOString().split("T")[0]
+//         }.csv`;
+//         a.click();
+//         URL.revokeObjectURL(url);
+//       }
+//     });
+// }
+
+// function renderTableRow(name, stat) {
+//   return `
+//     <tr class="hover:bg-gray-100">
+//       <td class="px-4 py-2 border font-medium">${name}</td>
+//       <td class="px-4 py-2 border text-center">${stat.total}</td>
+//       <td class="px-4 py-2 border text-center">${stat.completed}</td>
+//       <td class="px-4 py-2 border text-center">${
+//         stat.total - stat.completed
+//       }</td>
+//       <td class="px-4 py-2 border text-center">${stat.lastVisit || "--"}</td>
+//     </tr>
+//   `;
+// }
+
 function renderAdminAnalytics(user) {
   const fromDate = "2025-04-22";
   const toDate = "2025-12-31";
@@ -490,13 +709,27 @@ function renderAdminAnalytics(user) {
   )
     .then((res) => res.json())
     .then((visitData) => {
-      const validVisits = visitData.filter((v) => v.roCode !== "N/A");
+      // const validVisits = visitData.filter((v) => v.phase !== "NO PLAN");
+      const excludedPhases = [
+        "NO PLAN",
+        "RBML",
+        "JIO BP",
+        "BPCL",
+        "HPCL OFFICE",
+        "IN LEAVE",
+      ];
+      const validVisits = visitData.filter(
+        (v) => !excludedPhases.includes(v.phase)
+      );
+
       const analytics = {};
+      const engineerRows = {};
 
       validVisits.forEach((v) => {
         const eng = v.engineer;
         if (!analytics[eng]) {
           analytics[eng] = { total: 0, completed: 0, lastVisit: null };
+          engineerRows[eng] = [];
         }
         analytics[eng].total += 1;
         if (v.statusAvailable) analytics[eng].completed += 1;
@@ -508,18 +741,27 @@ function renderAdminAnalytics(user) {
         ) {
           analytics[eng].lastVisit = visitDate.toISOString().split("T")[0];
         }
+
+        engineerRows[eng].push({
+          ...v,
+          status: v.statusAvailable ? "Completed" : "Pending",
+        });
       });
 
       const sortedEngineers = Object.keys(analytics).sort();
       const container = document.getElementById("adminAnalyticsContainer");
 
-      // HTML for dropdown + apply button
+      // Render HTML
       container.innerHTML = `
-        <div class="relative inline-block mb-3" style="min-width: 240px;">
-          <button id="dropdownToggle" class="w-full text-left border px-3 py-2 rounded bg-white shadow" >
-            Select Engineer
+        <div class="relative inline-block mb-3 w-[260px]">
+          <button id="dropdownToggle" class="w-full text-left border px-3 py-2 rounded bg-white shadow">
+            Select Engineers ▼
           </button>
           <div id="checkboxDropdown" class="absolute z-10 mt-1 hidden border bg-white shadow rounded w-full max-h-60 overflow-y-auto">
+            <label class="block px-3 py-1 hover:bg-gray-100 font-semibold">
+              <input type="checkbox" id="selectAllEngineers" class="mr-2" />
+              All Engineers
+            </label>
             ${sortedEngineers
               .map(
                 (name) => `
@@ -539,17 +781,14 @@ function renderAdminAnalytics(user) {
             <thead class="bg-blue-600 text-white">
               <tr>
                 <th class="px-4 py-2 border">Engineer</th>
-                <th class="px-4 py-2 border">Total Visits</th>
-                <th class="px-4 py-2 border ">Status Updated</th>
-                <th class="px-4 py-2 border ">Status Pending</th>
-                <th class="px-4 py-2 border ">Last Visit</th>
+                <th class="px-4 py-2 border cursor-pointer" id="exportVisits">Total Visits</th>
+                <th class="px-4 py-2 border cursor-pointer" id="exportCompleted">Status Updated</th>
+                <th class="px-4 py-2 border">Status Pending</th>
+                <th class="px-4 py-2 border">Last Visit</th>
               </tr>
             </thead>
-            <tbody id="engineerTableBody" class="bg-white">
-              ${sortedEngineers
-                .map((name) => renderTableRow(name, analytics[name]))
-                .join("")}
-            </tbody>
+            <tbody id="engineerTableBody" class="bg-white"></tbody>
+            <tfoot id="engineerTableFoot"></tfoot>
           </table>
         </div>
       `;
@@ -558,42 +797,141 @@ function renderAdminAnalytics(user) {
       document
         .getElementById("dropdownToggle")
         .addEventListener("click", () => {
-          const dd = document.getElementById("checkboxDropdown");
-          dd.classList.toggle("hidden");
+          document
+            .getElementById("checkboxDropdown")
+            .classList.toggle("hidden");
         });
 
-      // Apply filter logic
-      document.getElementById("applyFilter").addEventListener("click", () => {
-        const selected = Array.from(
-          document.querySelectorAll(".engineerCheckbox:checked")
-        ).map((cb) => cb.value);
+      // Select All checkbox logic
+      document
+        .getElementById("selectAllEngineers")
+        .addEventListener("change", function () {
+          const allBoxes = document.querySelectorAll(".engineerCheckbox");
+          allBoxes.forEach((cb) => (cb.checked = this.checked));
+        });
+
+      // Helper: render table rows and totals
+      function renderAndUpdateTable(filtered) {
         const tbody = document.getElementById("engineerTableBody");
-
-        const filtered =
-          selected.length === 0
-            ? sortedEngineers
-            : sortedEngineers.filter((name) => selected.includes(name));
-
         tbody.innerHTML = filtered
           .map((name) => renderTableRow(name, analytics[name]))
           .join("");
 
-        // Optional: close dropdown on apply
+        const total = getTotals(filtered, analytics);
+        document.getElementById("engineerTableFoot").innerHTML = `
+          <tr class="bg-gray-100 font-semibold">
+            <td class="px-4 py-2 border text-left">Total</td>
+            <td class="px-4 py-2 border text-center">${total.visits}</td>
+            <td class="px-4 py-2 border text-center">${total.completed}</td>
+            <td class="px-4 py-2 border text-center">${total.pending}</td>
+            <td class="px-4 py-2 border"></td>
+          </tr>
+        `;
+      }
+
+      // Initial render with all engineers
+      renderAndUpdateTable(sortedEngineers);
+
+      // Apply filter
+      document.getElementById("applyFilter").addEventListener("click", () => {
+        const selected = getSelectedEngineers() || sortedEngineers;
+        renderAndUpdateTable(selected);
         document.getElementById("checkboxDropdown").classList.add("hidden");
       });
-    });
-}
 
-function renderTableRow(name, stat) {
-  return `
-    <tr class="hover:bg-gray-100">
-      <td class="px-4 py-2 border font-medium">${name}</td>
-      <td class="px-4 py-2 border text-center">${stat.total}</td>
-      <td class="px-4 py-2 border text-center">${stat.completed}</td>
-      <td class="px-4 py-2 border text-center">${
-        stat.total - stat.completed
-      }</td>
-      <td class="px-4 py-2 border text-center">${stat.lastVisit || "--"}</td>
-    </tr>
-  `;
+      // Export logic
+      document.getElementById("exportVisits").addEventListener("click", () => {
+        const selected = getSelectedEngineers() || sortedEngineers;
+        const rows = selected.flatMap((eng) => engineerRows[eng] || []);
+        exportToExcel(rows, "Total_Visits");
+      });
+
+      document
+        .getElementById("exportCompleted")
+        .addEventListener("click", () => {
+          const selected = getSelectedEngineers() || sortedEngineers;
+          const completedRows = selected.flatMap((eng) =>
+            (engineerRows[eng] || []).filter((r) => r.status === "Completed")
+          );
+          exportToExcel(completedRows, "Status_Updated");
+        });
+
+      function getSelectedEngineers() {
+        const checked = Array.from(
+          document.querySelectorAll(".engineerCheckbox:checked")
+        ).map((cb) => cb.value);
+        return checked.length > 0 ? checked : null;
+      }
+
+      function exportToExcel(rows, filenamePrefix) {
+        if (rows.length === 0) {
+          alert("No data to export!");
+          return;
+        }
+
+        const headers = [
+          "Engineer",
+          "RO Code",
+          "RO Name",
+          "Purpose",
+          "Issue Type",
+          "AMC Qtr",
+          "Date",
+          "Status",
+        ];
+        const csv = [
+          headers.join(","),
+          ...rows.map((r) =>
+            [
+              r.engineer,
+              r.roCode,
+              r.roName,
+              r.purpose,
+              r.issueType,
+              r.amcQtr,
+              r.date,
+              r.status,
+            ]
+              .map((v) => `"${v}"`)
+              .join(",")
+          ),
+        ].join("\n");
+
+        const blob = new Blob([csv], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${filenamePrefix}_${
+          new Date().toISOString().split("T")[0]
+        }.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      function getTotals(filteredEngineers, analytics) {
+        let visits = 0,
+          completed = 0;
+        filteredEngineers.forEach((name) => {
+          visits += analytics[name]?.total || 0;
+          completed += analytics[name]?.completed || 0;
+        });
+        return { visits, completed, pending: visits - completed };
+      }
+
+      function renderTableRow(name, stat) {
+        return `
+          <tr class="hover:bg-gray-100">
+            <td class="px-4 py-2 border font-medium">${name}</td>
+            <td class="px-4 py-2 border text-center">${stat.total}</td>
+            <td class="px-4 py-2 border text-center">${stat.completed}</td>
+            <td class="px-4 py-2 border text-center">${
+              stat.total - stat.completed
+            }</td>
+            <td class="px-4 py-2 border text-center">${
+              stat.lastVisit || "--"
+            }</td>
+          </tr>
+        `;
+      }
+    });
 }
